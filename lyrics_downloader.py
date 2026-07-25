@@ -205,6 +205,7 @@ def sync_audio_library_lyrics():
     summary_table.add_column("Audio File", style="bold white")
     summary_table.add_column("Search Source", style="dim")
     summary_table.add_column("Status", style="green")
+    report_rows = []
 
     with Progress(
         SpinnerColumn(),
@@ -241,12 +242,30 @@ def sync_audio_library_lyrics():
             if lyrics:
                 save_lrc_file(lrc_path, lyrics)
                 summary_table.add_row(fname, source_label, f"[bold green]{lyric_type}[/bold green]")
+                report_rows.append(f"{fname} | {source_label} | {lyric_type}")
             else:
                 summary_table.add_row(fname, source_label, "[dim red]Lyrics Not Found[/dim red]")
+                report_rows.append(f"{fname} | {source_label} | Lyrics Not Found")
 
             progress.advance(task)
 
     console.print(summary_table)
+
+    try:
+        report_path = os.path.join(PLAYLIST_FOLDER, "lyrics_download_report.txt")
+        import datetime
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(report_path, "w", encoding="utf-8") as rf:
+            rf.write(f"=== LYRICS DOWNLOAD REPORT ===\n")
+            rf.write(f"Date & Time: {timestamp}\n")
+            rf.write(f"Total Audio Files: {len(audio_files)}\n\n")
+            rf.write("FILE NAME | SEARCH SOURCE | STATUS\n")
+            rf.write("-" * 60 + "\n")
+            for row in report_rows:
+                rf.write(f"{row}\n")
+        console.print(f"\n[bold green]Report saved to:[/bold green] [underline magenta]playlist_sources/lyrics_download_report.txt[/underline magenta]")
+    except Exception as e:
+        console.print(f"[dim yellow]Notice: Could not write report file: {e}[/dim yellow]")
 
 def sync_playlist_text_lyrics():
     """Download .lrc files for songs listed in a playlist text file."""
