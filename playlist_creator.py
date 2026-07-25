@@ -22,7 +22,7 @@ PLAYLIST_SOURCES_DIR = os.path.join(BASE_DIR, SOURCE_FOLDER_NAME)
 
 CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
-REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI', 'http://127.0.0.1:8888/callback')
+REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI', 'https://127.0.0.1:8888/callback')
 SCOPE = 'playlist-modify-public playlist-modify-private'
 
 def ensure_source_folder():
