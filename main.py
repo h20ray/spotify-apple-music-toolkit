@@ -18,13 +18,16 @@ console = Console()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PLAYLIST_SOURCES_DIR = os.path.join(BASE_DIR, "playlist_sources")
 AUDIO_LIBRARY_DIR = os.path.join(BASE_DIR, "audio_library")
+PLAYLIST_EXPORTS_DIR = os.path.join(BASE_DIR, "playlist_exports")
+EXPORT_APPLE_MUSIC_DIR = os.path.join(PLAYLIST_EXPORTS_DIR, "apple_music")
+EXPORT_SPOTIFY_DIR = os.path.join(PLAYLIST_EXPORTS_DIR, "spotify")
 
 CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
 
 def ensure_all_folders():
     """Ensure all required project directories exist."""
-    for folder in [PLAYLIST_SOURCES_DIR, AUDIO_LIBRARY_DIR, os.path.join(PLAYLIST_SOURCES_DIR, "lyrics")]:
+    for folder in [PLAYLIST_SOURCES_DIR, AUDIO_LIBRARY_DIR, PLAYLIST_EXPORTS_DIR, EXPORT_APPLE_MUSIC_DIR, EXPORT_SPOTIFY_DIR, os.path.join(PLAYLIST_SOURCES_DIR, "lyrics")]:
         if not os.path.exists(folder):
             os.makedirs(folder)
 
@@ -128,15 +131,16 @@ def main():
         display_dashboard()
 
         console.print("\n[bold yellow]MAIN MENU OPTIONS:[/bold yellow]")
-        console.print(" [bold cyan]1[/bold cyan] [bold green]Complete Process Audio Library[/bold green] (Auto-Tag Metadata + Tempo + Style + Synced Lyrics)")
-        console.print(" [bold cyan]2[/bold cyan] Spotify Playlist Creator (Convert Text Files to Spotify Playlists)")
-        console.print(" [bold cyan]3[/bold cyan] Audio Tagger (Song Metadata, Tempo & Album Art)")
-        console.print(" [bold cyan]4[/bold cyan] Synced Lyrics Downloader (.LRC Lyrics Only)")
-        console.print(" [bold cyan]5[/bold cyan] [bold magenta]Album Art Fixer[/bold magenta] (Fix & Replace Artwork via iTunes API with Scoring)")
-        console.print(" [bold cyan]6[/bold cyan] View Workspace Files & Status")
-        console.print(" [bold cyan]0[/bold cyan] Exit")
+        console.print(" [bold bright_white]1[/bold bright_white] [bold bright_yellow]Complete Process Audio Library[/bold bright_yellow] [dim](Auto-Tag Metadata + Tempo + Style + Synced Lyrics)[/dim]")
+        console.print(" [bold bright_white]2[/bold bright_white] [bold green]Spotify Playlist Creator[/bold green] [dim](Convert Text Files to Spotify Playlists)[/dim]")
+        console.print(" [bold bright_white]3[/bold bright_white] [bold bright_red]Apple Music Playlist Creator[/bold bright_red] [dim](Convert Text Files to Apple Music Playlists)[/dim]")
+        console.print(" [bold bright_white]4[/bold bright_white] [bold cyan]Audio Tagger[/bold cyan] [dim](Song Metadata, Tempo & Album Art)[/dim]")
+        console.print(" [bold bright_white]5[/bold bright_white] [bold bright_blue]Synced Lyrics Downloader[/bold bright_blue] [dim](.LRC Lyrics Only)[/dim]")
+        console.print(" [bold bright_white]6[/bold bright_white] [bold magenta]Album Art Fixer[/bold magenta] [dim](Fix & Replace Artwork via iTunes API with Scoring)[/dim]")
+        console.print(" [bold bright_white]7[/bold bright_white] [bold yellow]View Workspace Files & Status[/bold yellow]")
+        console.print(" [bold bright_white]0[/bold bright_white] [dim white]Exit[/dim white]")
 
-        choice = Prompt.ask("\nSelect option", choices=["1", "2", "3", "4", "5", "6", "0"], default="1")
+        choice = Prompt.ask("\nSelect option", choices=["1", "2", "3", "4", "5", "6", "7", "0"], default="1")
 
         if choice == "1":
             run_one_click_complete_process()
@@ -148,21 +152,26 @@ def main():
             Prompt.ask("\nPress Enter to return")
 
         elif choice == "3":
+            import apple_music_playlist_creator
+            apple_music_playlist_creator.main()
+            Prompt.ask("\nPress Enter to return")
+
+        elif choice == "4":
             import audio_tagger
             audio_tagger.main()
             Prompt.ask("\nPress Enter to return")
 
-        elif choice == "4":
+        elif choice == "5":
             import lyrics_downloader
             lyrics_downloader.main()
             Prompt.ask("\nPress Enter to return")
 
-        elif choice == "5":
+        elif choice == "6":
             import album_art_fixer
             album_art_fixer.main()
             Prompt.ask("\nPress Enter to return")
 
-        elif choice == "6":
+        elif choice == "7":
             scan_workspace_overview()
             Prompt.ask("\nPress Enter to return")
 

@@ -1,0 +1,203 @@
+Name	Artist	Composer	Album	Genre	Size	Time	Disc Number	Disc Count	Track Number	Track Count	Year	Date Modified	Date Added	Bit Rate	Sample Rate	Volume Adjustment	Kind	Equalizer	Comments	Play Count	Last Played	Skip Count	Last Skipped	My Rating	Location
+1 Thing	Amerie		Touch			238																			
+21 Guns	Green Day		21st Century Breakdown (Deluxe Edition)			322																			
+24/7	Kevon Edmonds		24/7			274																			
+360	Charli xcx		BRAT			133																			
+A Thousand Miles	Vanessa Carlton		Be Not Nobody			237																			
+Always	Daniel Caesar		NEVER ENOUGH (Bonus Version)			225																			
+American Boy (feat. Kanye West)	Estelle		American Boy (feat. Kanye West) - Single			284																			
+Angel Baby	Troye Sivan		Angel Baby - Single			220																			
+Anxiety	Doechii		Anxiety - Single			249																			
+Baby By Me (feat. Ne-Yo)	50 Cent		Baby By Me			216																			
+Back to December	Taylor Swift		Speak Now			293																			
+bad	wave to earth		0.1 flaws and all.			263																			
+Bad Dreams	Teddy Swims		I've Tried Everything But Therapy (Part 2)			184																			
+Bad Habit	Steve Lacy		Gemini Rights			232																			
+Bad Habits	Ed Sheeran		Bad Habits - Single			230																			
+Be Her	Ella Langley		Dandelion			217																			
+Beautiful People	David Guetta & Sia		Beautiful People - Single			187																			
+Beautiful Things	Benson Boone		Beautiful Things - Single			180																			
+Bedroom Posters	Yellowcard		Bedroom Posters (feat. Good Charlotte) - Single			218																			
+Been Like This	Meghan Trainor & T-Pain		Timeless			145																			
+Beggin'	Måneskin		Chosen			211																			
+Best Part (feat. H.E.R.)	Daniel Caesar		Freudian			209																			
+Big (feat. Gunna)	Rita Ora, David Guetta & Imanbek		Bang - EP			156																			
+Billionaire (feat. Bruno Mars)	Travie McCoy		Billionaire (feat. Bruno Mars) - Deluxe Single			211																			
+BIRDS OF A FEATHER	Billie Eilish		HIT ME HARD AND SOFT			210																			
+bittersweet	Madison Beer		bittersweet - Single			202																			
+Blank Space	Taylor Swift		1989 (Deluxe Edition)			231																			
+Blinding Lights	The Weeknd		Blinding Lights - Single			201																			
+Blink	Corbyn Besson & TZUYU		Blink - Single			162																			
+BOOMPALA	LE SSERAFIM		'PUREFLOW', Pt. 1			176																			
+BOSS	NCT U		NCT 2018 EMPATHY			210																			
+Boys	Britney Spears		Britney (Deluxe Version)			206																			
+Bye Bye	Mariah Carey		E=MC2 (Deluxe Version)			266																			
+California Gurls (feat. Snoop Dogg)	Katy Perry		Teenage Dream: The Complete Confection			234																			
+Call It Off (feat. JAEHYUN)	Emotional Oranges		Call It Off (feat. JAEHYUN) - Single			216																			
+Call Me When You Break Up	Selena Gomez, benny blanco & Gracie Abrams		I Said I Love You First			126																			
+Can We Talk	Tevin Campbell		I'm Ready			284																			
+Circles	Post Malone		Hollywood's Bleeding			215																			
+Close To Me	Ellie Goulding, Diplo & Swae Lee		Brightest Blue			182																			
+Close To You	Gracie Abrams		The Secret of Us			225																			
+Come Away With Me	Norah Jones		Come Away With Me (Super Deluxe Edition)			198																			
+Crazy	Javier		Javier			293																			
+Creepin'	Metro Boomin, The Weeknd & 21 Savage		HEROES & VILLAINS (Villains Version)			221																			
+Cruel Summer	Taylor Swift		Lover			178																			
+Cupid	FIFTY FIFTY		The Beginning: Cupid - Single			174																			
+Dancing In The Flames	The Weeknd		Dancing In The Flames - Single			220																			
+Dead and Gone (feat. Justin Timberlake)	T.I.		Paper Trail (Deluxe Version)			299																			
+Die With A Smile	Lady Gaga & Bruno Mars		Die With A Smile - Single			251																			
+DNA	BTS		Love Yourself 結 'Answer'			223																			
+Do What You Gotta (feat. Sunset Rollercoaster)	Prep		One Day In The Sun - EP			188																			
+Don't Say You Love Me	M2M		Shades of Purple			225																			
+double take	Dhruv		double take - Single			171																			
+EASY	LE SSERAFIM		EASY - EP			164																			
+Easy On Me	Adele		30			224																			
+Espresso	Sabrina Carpenter		Espresso - Single			175																			
+Everybody's Changing	Keane		Hopes and Fears			215																			
+Everything You Do	Christian Bautista		Christian Bautista			233																			
+Feather	Sabrina Carpenter		emails i can't send fwd:			185																			
+feelslikeimfallinginlive	Coldplay		Moon Music (Full Moon Edition)			276																			
+Finesse (Remix) [feat. Cardi B]	Bruno Mars		Finesse (Remix) [feat. Cardi B] - Single			217																			
+Flowers	Miley Cyrus		Endless Summer Vacation			200																			
+From The Start	Laufey		From The Start - Single			169																			
+Gabriela	KATSEYE		BEAUTIFUL CHAOS - EP			197																			
+GIRLS	The Kid LAROI		GIRLS - Single			152																			
+Give Me Everything (feat. Ne-Yo, Afrojack & Nayer)	Pitbull		Planet Pit			252																			
+Give Me Your Forever	Zack Tabudlo		Episode			244																			
+Gone	*NSYNC		Celebrity			292																			
+good 4 u	Olivia Rodrigo		SOUR			178																			
+Good Life	OneRepublic		Waking Up			253																			
+Good Luck, Babe!	Chappell Roan		Good Luck, Babe! - Single			218																			
+Great Pretender	Dominic Fike		Rocket			171																			
+Green Light (feat. André 3000)	John Legend		Evolver			284																			
+Grenade	Bruno Mars		Doo-Wops & Hooligans			222																			
+Havana (feat. Young Thug)	Camila Cabello		Camila			217																			
+Heartbeat	Tahiti 80		Puzzle			206																			
+Hey Baby	No Doubt		Hey Baby - Single			207																			
+Hold My Hand	Jess Glynne		I Cry When I Laugh			227																			
+Holy Blindfold	Chris Brown		Holy Blindfold - Single			170																			
+Horizon	Diplo & Leon Bridges		Diplo Presents Thomas Wesley: Chapter 2 - Swamp Savant			148																			
+Houdini	Dua Lipa		Houdini - Single			185																			
+how do you dance?	yung kai		stay with the ocean, i'll find you			201																			
+HOW DOES IT FEEL?	The Kid LAROI		HOW DOES IT FEEL? - Single			137																			
+I Ain't Worried	OneRepublic		Top Gun: Maverick (Music from the Motion Picture)			148																			
+I Don't Love You	My Chemical Romance		The Black Parade			238																			
+I Had Some Help (feat. Morgan Wallen)	Post Malone		I Had Some Help (feat. Morgan Wallen) - Single			178																			
+I Knew It, I Knew You (From "Toy Story 5")	Taylor Swift		I Knew It, I Knew You (From "Toy Story 5") - Single			178																			
+i like the way you kiss me	Artemas		yustyna			142																			
+I Need Your Love (feat. Ellie Goulding)	Calvin Harris		18 Months			234																			
+Through The Wire	Kanye West		The College Dropout			221																			
+If I Ever Feel Better	Phoenix		United			266																			
+If We Ever Broke Up	Mae Stephens		If We Ever Broke Up - Single			142																			
+If You're Not the One	Daniel Bedingfield		Gotta Get Thru This			257																			
+In My Place	Coldplay		A Rush of Blood to the Head			228																			
+in plain sight	Khalid		after the sun goes down			145																			
+Inside Out	keshi		Requiem (Deluxe)			237																			
+It's ok I'm ok	Tate McRae		It's ok I'm ok - Single			156																			
+Jealous Type	Doja Cat		Vie			163																			
+Just the Way You Are	Bruno Mars		Doo-Wops & Hooligans (Deluxe)			220																			
+Keep Holding On	Avril Lavigne		The Best Damn Thing (Expanded Edition)			239																			
+Kiss of Life	Sade		Love Deluxe			350																			
+ladybug	Chris LaRocca		ladybug - Single			123																			
+Last Train (feat. Oh Yun)	Dept		Before Sunset			184																			
+Lean On (feat. DJ Snake & MØ)	Major Lazer		Peace Is The Mission (Extended)			176																			
+Lighters (feat. Bruno Mars)	Bad Meets Evil		Hell: The Sequel (Deluxe Edition)			303																			
+Like I Love You	Justin Timberlake		Justified			283																			
+Like I'm Gonna Lose You (feat. John Legend)	Meghan Trainor		Title (Special Edition)			225																			
+Like You	Bow Wow		Like You (feat. Ciara) - EP			204																			
+Lose Control	Teddy Swims		I've Tried Everything But Therapy (Part 1)			210																			
+Lose My Mind (feat. Doja Cat) [From F1® The Movie]	Don Toliver		Lose My Mind (feat. Doja Cat) [From F1® The Movie] - Single			209																			
+love is a mystery	slchld		love is a mystery - Single			219																			
+Love Like This	Fujii Kaze		Prema			260																			
+Love Me Harder	Ariana Grande & The Weeknd		My Everything			236																			
+Love the Way You Lie, Pt. 2 (feat. Eminem)	Rihanna		Loud (Deluxe)			296																			
+Made You Look	Meghan Trainor		Takin' It Back			134																			
+Make It Better (feat. Smokey Robinson)	Anderson .Paak		Ventura			219																			
+Man I Need	Olivia Dean		The Art of Loving			184																			
+Margarita (Featuring Pharrell & Big Boi)	Sleepy Brown featuring Pharrell & Big Boi		Mr. Brown			287																			
+mood swings	Henry Moodie		mood swings			125																			
+Moonlight	Kali Uchis		Red Moon In Venus			187																			
+Moonlit Floor	LISA		Moonlit Floor (Kiss Me) - Single			155																			
+morethanwordscansay.	GRACE.		morethanwordscansay. - Single			252																			
+Moves Like Jagger (feat. Christina Aguilera)	Maroon 5		Hands All Over			201																			
+Mr. Brightside	The Killers		Direct Hits			223																			
+My Universe	Coldplay X BTS		My Universe - Single			228																			
+Mystical Magical	Benson Boone		American Heart			165																			
+Never Say Never (feat. Jaden) [Single Version]	Justin Bieber		old summer vibes			227																			
+Night Changes	One Direction		FOUR (Deluxe)			226																			
+Nobody Gets Me	SZA		SOS			180																			
+Nothin' On You	B.o.B		Nothin' On You (feat. Bruno Mars) - EP			269																			
+On Top of the World	Imagine Dragons		Night Visions (Deluxe Version)			192																			
+One Of The Girls	The Weeknd, JENNIE & Lily Rose Depp		One of the Girls - EP			244																			
+Onefourthree (feat. Buddy & BJ the Chicago Kid)	Hermitude		Pollyanarchy (Deluxe Version)			227																			
+Only Wanna Be With You	Hootie & The Blowfish		Cracked Rear View			229																			
+Perfect	Ed Sheeran		÷ (Deluxe)			263																			
+Pink Pony Club	Chappell Roan		Pink Pony Club - Single			258																			
+Please Please Please	Sabrina Carpenter		Short n' Sweet			186																			
+Psycho	Post Malone		beerbongs & bentleys			221																			
+PUSH 2 START	Tyla		TYLA +			157																			
+Reckless	Madison Beer		Reckless - Single			203																			
+Rolling in the Deep	Adele		21			228																			
+Sailor Song	Gigi Perez		Sailor Song - Single			211																			
+Sapphire	Ed Sheeran		Sapphire			179																			
+Saturn	SZA		Saturn			181																			
+Say Something	Haven		Between The Senses			229																			
+Senorita	Diljit Dosanjh, Mixsingh & Raj Ranjodh		AURA			178																			
+Sexy Love	Ne-Yo		In My Own Words			220																			
+SexyBack (feat. Timbaland)	Justin Timberlake		FutureSex/LoveSounds Deluxe Edition			242																			
+Sharks	Imagine Dragons		Mercury - Acts 1 & 2			190																			
+She’s Gone, Dance On (Todd Edwards Remix)	Disclosure		She’s Gone, Dance On (Todd Edwards Remix)			194																			
+Shivers	Ed Sheeran		=			207																			
+Shower	Becky G		Shower			205																			
+Since U Been Gone	Kelly Clarkson		Greatest Hits - Chapter One			188																			
+Smile	Katy Perry		Smile			168																			
+So Sick	Ne-Yo		In My Own Words			207																			
+Soft Spot	keshi		Requiem			204																			
+Somebody Else	The 1975		I like it when you sleep, for you are so beautiful yet so unaware of it			347																			
+Someday We'll Know	Mandy Moore & Jonathan Foreman		A Walk to Remember (Music from the Motion Picture)			222																			
+Somewhere Over the Rainbow	Katharine McPhee		Somewhere Over the Rainbow / My Destiny - Single			210																			
+sore throat	Thomas Day		sore throat			144																			
+Sorry Mom	Devon Cole		Sorry Mom - Single			165																			
+Sour Candy	Lady Gaga & BLACKPINK		Sour Candy - Single			157																			
+Starboy (feat. Daft Punk)	The Weeknd		Starboy			230																			
+Stargazing	Myles Smith		Stargazing			172																			
+Story Of My Life	One Direction		Midnight Memories			245																			
+Strangers	Kenya Grace		Strangers - Single			172																			
+stupid song	Olivia Rodrigo		you seem pretty sad for a girl so in love			209																			
+Sugar	Maroon 5		V (Deluxe)			235																			
+Superman (It's Not Easy)	Five For Fighting		America Town			220																			
+supernatural	Ariana Grande & Troye Sivan		eternal sunshine (slightly deluxe)			163																			
+Sweet Disposition (a moment, a love)	Lost Frequencies		Sweet Disposition (a moment, a love)			212																			
+Talk (feat. George Maple)	DJ Snake		Encore			237																			
+Tears	Sabrina Carpenter		Man’s Best Friend			160																			
+That's So True	KIDZ BOP Kids		KIDZ BOP 51			165																			
+The Door	Teddy Swims		I've Tried Everything But Therapy (Part 1)			212																			
+The Giver	Chappell Roan		The Giver - Single			202																			
+The One That Got Away	Katy Perry		Teenage Dream			227																			
+The Suburbs	Ruel		The Suburbs			188																			
+THIS IS FOR	TWICE		THIS IS FOR			131																			
+this is what forever feels like	JVKE		this is what forever feels like			154																			
+Thnks fr th Mmrs	Fall Out Boy		Infinity On High			203																			
+Timeless	The Weeknd & Playboi Carti		Timeless - Single			256																			
+Tip Toe	HYBS		Tip Toe			224																			
+Too Sweet	Hozier		Unheard			251																			
+toxic till the end	ROSÉ		rosie			156																			
+Treat Each Other Right	Jamie xx		In Waves			240																			
+True	Hulvey		CRY			141																			
+United States of Pop	DJ Earworm		United States of Pop - Single			196																			
+Until I Found You	Stephen Sanchez		Until I Found You - Single			177																			
+Watermelon Sugar	Harry Styles		Fine Line			173																			
+Way Back Into Love	Hugh Grant & Haley Bennett		Music and Lyrics (Music from the Motion Picture)			277																			
+we can't be friends (wait for your love)	Ariana Grande		eternal sunshine			228																			
+Well Well Well	Gráinne Duffy		Dirt Woman Blues			247																			
+What a Girl Wants	Christina Aguilera		Christina Aguilera (Expanded Edition)			215																			
+Whatcha Say	Jason Derulo		Jason Derulo			221																			
+Who	Jimin		MUSE			170																			
+Why Does It Hurt So Bad (from "Waiting to Exhale" - Original Soundtrack)	Whitney Houston		I Wanna Dance With Somebody (The Movie: Whitney New, Classic and Reimagined)			277																			
+Why Why Why	Shawn Mendes		Shawn			169																			
+Work (feat. Drake)	Rihanna		ANTI (Deluxe)			219																			
+Yeah! (feat. Lil Jon & Ludacris)	USHER		Confessions (Expanded Edition)			250																			
+yes baby	Madison Beer		yes baby - Single			175																			
+You and Me	Lifehouse		Lifehouse			195																			
+Young, Wild & Free (feat. Bruno Mars)	Snoop Dogg		Mac and Devin Go To High School (Music From and Inspired By The Movie)			207																			
