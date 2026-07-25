@@ -1,7 +1,7 @@
 import os
 import sys
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
+from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv
 
 from rich.console import Console
@@ -29,23 +29,16 @@ def ensure_all_folders():
             os.makedirs(folder)
 
 def check_spotify_connection():
-    """Check Spotify connection status."""
+    """Check Spotify API connection status seamlessly without blocking."""
     if not CLIENT_ID or not CLIENT_SECRET:
         return None, "[bold red]Offline (Missing .env API Keys)[/bold red]"
     try:
-        auth_manager = SpotifyOAuth(
-            client_id=CLIENT_ID,
-            client_secret=CLIENT_SECRET,
-            redirect_uri=os.getenv('SPOTIPY_REDIRECT_URI', 'http://127.0.0.1:8888/callback'),
-            scope='playlist-modify-public playlist-modify-private',
-            open_browser=False
-        )
-        sp = spotipy.Spotify(auth_manager=auth_manager)
-        user = sp.current_user()
-        display_name = user.get('display_name', user['id'])
-        return sp, f"[bold green]Connected as:[/bold green] {display_name} ({user['id']})"
+        auth_mgr = SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
+        sp = spotipy.Spotify(client_credentials_manager=auth_mgr)
+        sp.search(q="test", limit=1, type="track")
+        return sp, "[bold green]API Connection Active (Ready)[/bold green]"
     except Exception:
-        return None, "[bold yellow]Connected via API Client Credentials[/bold yellow]"
+        return None, "[bold yellow]Offline (Invalid API Credentials)[/bold yellow]"
 
 def display_dashboard():
     """Display main dashboard header."""

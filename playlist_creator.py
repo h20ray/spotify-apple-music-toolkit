@@ -281,10 +281,16 @@ def main():
     ensure_source_folder()
     display_header()
     
-    with console.status("[bold green]Connecting to Spotify...[/bold green]"):
-        sp = get_spotify_client()
-        user_info = sp.current_user()
-        
+    console.print(Panel(
+        "[bold cyan]SPOTIFY ACCOUNT LOGIN[/bold cyan]\n"
+        "[dim]Option 2 requires playlist creation permissions on your Spotify account.\n"
+        "Your web browser will open automatically to authorize access.\n"
+        "If prompted, log in and copy the redirected URL back to the terminal.[/dim]",
+        border_style="yellow"
+    ))
+    
+    sp = get_spotify_client()
+    user_info = sp.current_user()
     interactive_menu(sp, user_info)
 
 if __name__ == '__main__':
