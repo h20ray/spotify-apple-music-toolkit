@@ -13,7 +13,7 @@ logging.getLogger('spotipy').setLevel(logging.CRITICAL)
 
 import mutagen
 from mutagen.mp3 import MP3
-from mutagen.id3 import ID3, TIT2, TPE1, TALB, TCON, TBPM, TXXX, TMOO, APIC, ID3NoHeaderError
+from mutagen.id3 import ID3, TIT2, TPE1, TALB, TCON, TBPM, TXXX, TMOO, COMM, APIC, ID3NoHeaderError
 from mutagen.mp4 import MP4, MP4Cover
 
 from rich.console import Console
@@ -244,7 +244,7 @@ def tag_mp3_file(file_path, final_meta, write_cover=True):
             tags.add(TBPM(encoding=3, text=str(final_meta['bpm'])))
 
         tags.add(TMOO(encoding=3, text=final_meta['mood']))
-        tags.add(TXXX(encoding=3, desc='WM/Mood', text=final_meta['mood']))
+        tags.add(COMM(encoding=3, lang='eng', desc='', text=f"Mood: {final_meta['mood']}"))
 
         if write_cover and final_meta['cover_data']:
             tags.add(APIC(
@@ -255,8 +255,7 @@ def tag_mp3_file(file_path, final_meta, write_cover=True):
                 data=final_meta['cover_data']
             ))
 
-        # Save as ID3v2.3 for Windows File Explorer compatibility
-        audio.save(v2_version=3)
+        audio.save()
         return True
     except Exception as e:
         console.print(f"[red]Failed to tag MP3 '{os.path.basename(file_path)}': {e}[/red]")
@@ -278,7 +277,6 @@ def tag_m4a_file(file_path, final_meta, write_cover=True):
             audio['tmpo'] = [final_meta['bpm']]
 
         audio['----:com.apple.iTunes:MOOD'] = final_meta['mood'].encode('utf-8')
-        audio['----:com.apple.iTunes:WM/Mood'] = final_meta['mood'].encode('utf-8')
         audio['\xa9cmt'] = [f"Mood: {final_meta['mood']}"]
 
         if write_cover and final_meta['cover_data']:
