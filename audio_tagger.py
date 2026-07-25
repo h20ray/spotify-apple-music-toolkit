@@ -332,6 +332,7 @@ def process_audio_folder(folder_path, mode=None):
     summary_table.add_column("Album", style="cyan")
     summary_table.add_column("Tempo (BPM)", justify="right", style="bold yellow")
     summary_table.add_column("Status", style="dim")
+    report_rows = []
 
     with Progress(
         SpinnerColumn(),
@@ -411,12 +412,37 @@ def process_audio_folder(folder_path, mode=None):
                     f"{bpm_val} BPM" if bpm_val > 0 else "-",
                     action_desc
                 )
+                report_rows.append(f"{fname} | {final_title} - {final_artist} | {final_album} | {final_genre} | {final_mood} | {bpm_val} BPM | {action_desc}")
             else:
                 summary_table.add_row(fname, "[dim red]Failed[/dim red]", "-", "-", "-")
+                report_rows.append(f"{fname} | FAILED")
 
             progress.advance(task)
 
     console.print(summary_table)
+
+    # Save report to text file
+    try:
+        report_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "playlist_sources")
+        if not os.path.exists(report_dir):
+            os.makedirs(report_dir)
+        report_path = os.path.join(report_dir, "audio_tagging_report.txt")
+        
+        import datetime
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        with open(report_path, "w", encoding="utf-8") as rf:
+            rf.write(f"=== AUDIO TAGGING REPORT ===\n")
+            rf.write(f"Date & Time: {timestamp}\n")
+            rf.write(f"Total Processed Tracks: {len(audio_files)}\n\n")
+            rf.write("FILE NAME | TITLE & ARTIST | ALBUM | GENRE | MOOD/STYLE | TEMPO (BPM) | STATUS\n")
+            rf.write("-" * 80 + "\n")
+            for row in report_rows:
+                rf.write(f"{row}\n")
+        
+        console.print(f"\n[bold green]Report saved to:[/bold green] [underline magenta]playlist_sources/audio_tagging_report.txt[/underline magenta]")
+    except Exception as e:
+        console.print(f"[dim yellow]Notice: Could not write report file: {e}[/dim yellow]")
 
 def main():
     console.clear()
