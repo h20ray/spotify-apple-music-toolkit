@@ -1,6 +1,8 @@
 import os
 import sys
 import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from threading import Lock
 from dotenv import load_dotenv
 
 import mutagen
@@ -12,6 +14,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
+from rich.live import Live
 from rich.prompt import Prompt
 
 if sys.platform == 'win32':
@@ -29,6 +32,8 @@ LRCLIB_GET_URL = "https://lrclib.net/api/get"
 LRCLIB_SEARCH_URL = "https://lrclib.net/api/search"
 
 COMPILATION_KEYWORDS = ["various artists", "compilation", "greatest hits", "best of", "now that's what i call", "top 100", "essential classics", "soundtrack"]
+
+STATUS_LOCK = Lock()
 
 def ensure_folders():
     """Ensure destination directories exist."""
@@ -192,78 +197,137 @@ def save_lrc_file(output_path, lyrics_content):
         console.print(f"[red]Error saving {output_path}: {e}[/red]")
         return False
 
-def sync_audio_library_lyrics():
-    """Download .lrc files for audio_library folder."""
+def _process_single_lrc_worker(fname, thread_slot, progress, master_task, worker_status):
+    """Worker function for fetching lyrics concurrently for single file."""
+    file_path = os.path.join(AUDIO_FOLDER, fname)
+    file_base = os.path.splitext(fname)[0]
+    lrc_path = os.path.join(AUDIO_FOLDER, f"{file_base}.lrc")
+
+    id3_title, id3_artist, id3_album = read_local_audio_metadata(file_path)
+
+    if id3_title and id3_artist:
+        query_title = id3_title
+        query_artist = id3_artist
+        source_label = "Audio File Tags"
+    else:
+        query_title = file_base
+        query_artist = ""
+        if ' - ' in file_base:
+            parts = file_base.split(' - ', 1)
+            query_artist, query_title = parts[0].strip(), parts[1].strip()
+        source_label = "File Name"
+
+    disp_text = f"{query_artist} - {query_title}".strip(" -")
+
+    with STATUS_LOCK:
+        worker_status[thread_slot] = f"[bold cyan]Thread #{thread_slot+1:02d}[/bold cyan] Fetching LRC: [white]{disp_text[:50]}[/white]"
+
+    try:
+        lyrics, lyric_type, album_name = fetch_synced_lrc(query_title, query_artist, id3_album or "")
+
+        if lyrics:
+            save_lrc_file(lrc_path, lyrics)
+            return {
+                'fname': fname,
+                'source': source_label,
+                'lyric_type': lyric_type,
+                'success': True,
+                'report': f"{fname} | {source_label} | {lyric_type}"
+            }
+        else:
+            return {
+                'fname': fname,
+                'source': source_label,
+                'lyric_type': 'Lyrics Not Found',
+                'success': False,
+                'report': f"{fname} | {source_label} | Lyrics Not Found"
+            }
+    finally:
+        progress.advance(master_task)
+
+def sync_audio_library_lyrics(max_workers=10):
+    """Multi-threaded download of .lrc files for audio_library folder."""
     audio_files = [f for f in os.listdir(AUDIO_FOLDER) if f.lower().endswith(('.mp3', '.m4a', '.flac', '.aac'))]
     if not audio_files:
         console.print(f"[bold yellow]No audio files found in '{AUDIO_FOLDER}/'.[/bold yellow]")
         return
 
-    console.print(f"\n[bold green]Syncing Synced Lyrics for {len(audio_files)} audio file(s)[/bold green]\n")
+    console.print(f"\n[bold green]Syncing Synced Lyrics for {len(audio_files)} audio file(s) | Multi-Threaded Engine ({max_workers} threads)...[/bold green]\n")
 
-    summary_table = Table(title="Audio Library Synced Lyrics", border_style="cyan", header_style="bold magenta")
-    summary_table.add_column("Audio File", style="bold white")
-    summary_table.add_column("Search Source", style="dim")
-    summary_table.add_column("Status", style="green")
-    report_rows = []
-
-    with Progress(
+    results = []
+    progress = Progress(
         SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
         TaskProgressColumn(),
+        BarColumn(),
+        TextColumn("[bold green]Lyrics Progress ({task.completed}/{task.total} files)[/bold green]"),
         console=console
-    ) as progress:
-        task = progress.add_task("Fetching lyrics...", total=len(audio_files))
+    )
+    master_task = progress.add_task("Overall", total=len(audio_files))
 
-        for fname in audio_files:
-            file_path = os.path.join(AUDIO_FOLDER, fname)
-            file_base = os.path.splitext(fname)[0]
-            lrc_path = os.path.join(AUDIO_FOLDER, f"{file_base}.lrc")
-            
-            id3_title, id3_artist, id3_album = read_local_audio_metadata(file_path)
+    worker_status = [f"[dim]Thread #{i+1:02d}: Active...[/dim]" for i in range(max_workers)]
 
-            if id3_title and id3_artist:
-                query_title = id3_title
-                query_artist = id3_artist
-                source_label = "Audio File Tags"
-            else:
-                query_title = file_base
-                query_artist = ""
-                if ' - ' in file_base:
-                    parts = file_base.split(' - ', 1)
-                    query_artist, query_title = parts[0].strip(), parts[1].strip()
-                source_label = "File Name"
+    def build_renderable():
+        tbl = Table.grid(padding=(0, 0))
+        tbl.add_column()
+        tbl.add_row(progress)
+        with STATUS_LOCK:
+            for st in worker_status:
+                tbl.add_row(st)
+        return tbl
 
-            progress.update(task, description=f"Fetching: [dim]{query_title[:25]}...[/dim]")
+    with Live(build_renderable(), refresh_per_second=12, console=console) as live:
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_file = {}
+            for idx, fname in enumerate(audio_files):
+                thread_slot = idx % max_workers
+                future = executor.submit(_process_single_lrc_worker, fname, thread_slot, progress, master_task, worker_status)
+                future_to_file[future] = fname
 
-            lyrics, lyric_type, album_name = fetch_synced_lrc(query_title, query_artist, id3_album or "")
+            for future in as_completed(future_to_file):
+                res = future.result()
+                results.append(res)
+                live.update(build_renderable())
 
-            if lyrics:
-                save_lrc_file(lrc_path, lyrics)
-                summary_table.add_row(fname, source_label, f"[bold green]{lyric_type}[/bold green]")
-                report_rows.append(f"{fname} | {source_label} | {lyric_type}")
-            else:
-                summary_table.add_row(fname, source_label, "[dim red]Lyrics Not Found[/dim red]")
-                report_rows.append(f"{fname} | {source_label} | Lyrics Not Found")
+    results.sort(key=lambda x: x['fname'].lower())
 
-            progress.advance(task)
+    # --- CLI Summary ---
+    count_synced = sum(1 for r in results if r['success'])
+    count_missing = len(results) - count_synced
 
-    console.print(summary_table)
+    console.print()
+    console.print(Panel(
+        f"[bold white]Total Audio Files:[/bold white] {len(results)}  |  "
+        f"[bold green]Synced Lyrics (.LRC) Saved:[/bold green] {count_synced}  |  "
+        f"[bold red]Lyrics Not Found:[/bold red] {count_missing}",
+        title="[bold cyan]Multi-Threaded Lyrics Downloader Overview[/bold cyan]",
+        border_style="cyan"
+    ))
+
+    # --- Exceptions Summary Table ---
+    exceptions = [r for r in results if not r['success']]
+    if exceptions:
+        summary_table = Table(title="[bold yellow]Missing Lyrics Summary[/bold yellow]", border_style="cyan", header_style="bold magenta")
+        summary_table.add_column("Audio File", style="bold white")
+        summary_table.add_column("Search Source", style="dim")
+        summary_table.add_column("Status", style="red")
+        for r in exceptions:
+            summary_table.add_row(r['fname'], r['source'], "[dim red]Lyrics Not Found[/dim red]")
+        console.print(summary_table)
 
     try:
         report_path = os.path.join(PLAYLIST_FOLDER, "lyrics_download_report.txt")
         import datetime
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with open(report_path, "w", encoding="utf-8") as rf:
-            rf.write(f"=== LYRICS DOWNLOAD REPORT ===\n")
+            rf.write(f"=== MULTI-THREADED LYRICS DOWNLOAD REPORT ===\n")
             rf.write(f"Date & Time: {timestamp}\n")
-            rf.write(f"Total Audio Files: {len(audio_files)}\n\n")
+            rf.write(f"Total Audio Files: {len(audio_files)}\n")
+            rf.write(f"Worker Threads Used: {max_workers}\n\n")
             rf.write("FILE NAME | SEARCH SOURCE | STATUS\n")
             rf.write("-" * 60 + "\n")
-            for row in report_rows:
-                rf.write(f"{row}\n")
-        console.print(f"\n[bold green]Report saved to:[/bold green] [underline magenta]playlist_sources/lyrics_download_report.txt[/underline magenta]")
+            for r in results:
+                rf.write(f"{r['report']}\n")
+        console.print(f"\n[bold green]Report saved to:[/bold green] [underline magenta]playlist_sources/lyrics_download_report.txt[/underline magenta]\n")
     except Exception as e:
         console.print(f"[dim yellow]Notice: Could not write report file: {e}[/dim yellow]")
 
@@ -368,12 +432,12 @@ def main():
         console.clear()
         console.print(Panel(
             "[bold cyan]SYNCED LYRICS DOWNLOADER (.LRC)[/bold cyan]\n"
-            "[dim]Downloads scrolling timestamped lyrics for audio files and text lists[/dim]",
+            "[dim]Downloads scrolling timestamped lyrics for audio files and text lists via Multi-Threading[/dim]",
             border_style="green"
         ))
 
         console.print("\n[bold yellow]LYRICS MENU OPTIONS:[/bold yellow]")
-        console.print(" [bold cyan]1[/bold cyan] Sync Lyrics for Local Audio Files (audio_library/)")
+        console.print(" [bold cyan]1[/bold cyan] Sync Lyrics for Local Audio Files (audio_library/) [Multi-Threaded]")
         console.print(" [bold cyan]2[/bold cyan] Download Lyrics for Playlist Text Files (playlist_sources/)")
         console.print(" [bold cyan]3[/bold cyan] Search & Download Lyrics for a Single Track")
         console.print(" [bold cyan]0[/bold cyan] Return to Main Menu")
@@ -381,7 +445,12 @@ def main():
         choice = Prompt.ask("\nSelect option", choices=["1", "2", "3", "0"], default="1")
 
         if choice == "1":
-            sync_audio_library_lyrics()
+            try:
+                workers_input = Prompt.ask("\nSelect worker thread count (e.g. 5 to 20)", default="10")
+                workers_val = int(workers_input)
+            except Exception:
+                workers_val = 10
+            sync_audio_library_lyrics(max_workers=workers_val)
             Prompt.ask("\nPress Enter to return")
         elif choice == "2":
             sync_playlist_text_lyrics()
