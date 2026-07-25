@@ -285,14 +285,23 @@ def main():
         "[bold cyan]SPOTIFY ACCOUNT LOGIN[/bold cyan]\n"
         "[dim]Option 2 requires playlist creation permissions on your Spotify account.\n"
         "Your web browser will open automatically to authorize access.\n\n"
-        "Important: Ensure 'http://127.0.0.1:8888/callback' is added in your Spotify Developer Dashboard under App Settings > Redirect URIs.\n"
-        "If prompted, log in and copy the redirected URL back to the terminal.[/dim]",
+        "Important: Make sure to click the blue 'Save' button at the bottom of your Spotify Dashboard!\n"
+        "Press Ctrl+C at any time to return to the Main Menu.[/dim]",
         border_style="yellow"
     ))
     
-    sp = get_spotify_client()
-    user_info = sp.current_user()
-    interactive_menu(sp, user_info)
+    try:
+        sp = get_spotify_client()
+        user_info = sp.current_user()
+        interactive_menu(sp, user_info)
+    except (KeyboardInterrupt, EOFError):
+        console.print("\n[bold yellow]Returning to Main Menu...[/bold yellow]")
+        return
+    except Exception as e:
+        console.print(f"\n[bold red]Authentication Notice:[/bold red] {e}")
+        console.print("[dim]Check your .env settings and ensure you clicked 'Save' in the Spotify Dashboard.[/dim]")
+        Prompt.ask("\nPress Enter to return to Main Menu")
+        return
 
 if __name__ == '__main__':
     main()
