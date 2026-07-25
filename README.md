@@ -31,7 +31,7 @@ To enable Spotify integration:
 3. Fill in:
    - **App name:** `Music Toolkit`
    - **App description:** `Audio Tagging and Playlist Manager`
-   - **Redirect URIs:** `http://127.0.0.1:8888/callback`
+   - **Redirect URIs:** `https://127.0.0.1:8888/callback`
 4. Save the app and click **Settings**.
 5. Copy your **Client ID** and **Client Secret**.
 
@@ -46,7 +46,7 @@ Paste your Client ID and Client Secret into `.env`:
 ```env
 SPOTIPY_CLIENT_ID=your_client_id_here
 SPOTIPY_CLIENT_SECRET=your_client_secret_here
-SPOTIPY_REDIRECT_URI=http://127.0.0.1:8888/callback
+SPOTIPY_REDIRECT_URI=https://127.0.0.1:8888/callback
 ```
 
 ---
