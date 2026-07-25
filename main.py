@@ -132,10 +132,11 @@ def main():
         console.print(" [bold cyan]2[/bold cyan] Spotify Playlist Creator (Convert Text Files to Spotify Playlists)")
         console.print(" [bold cyan]3[/bold cyan] Audio Tagger (Song Metadata, Tempo & Album Art)")
         console.print(" [bold cyan]4[/bold cyan] Synced Lyrics Downloader (.LRC Lyrics Only)")
-        console.print(" [bold cyan]5[/bold cyan] View Workspace Files & Status")
+        console.print(" [bold cyan]5[/bold cyan] [bold magenta]Album Art Fixer[/bold magenta] (Fix & Replace Artwork via iTunes API with Scoring)")
+        console.print(" [bold cyan]6[/bold cyan] View Workspace Files & Status")
         console.print(" [bold cyan]0[/bold cyan] Exit")
 
-        choice = Prompt.ask("\nSelect option", choices=["1", "2", "3", "4", "5", "0"], default="1")
+        choice = Prompt.ask("\nSelect option", choices=["1", "2", "3", "4", "5", "6", "0"], default="1")
 
         if choice == "1":
             run_one_click_complete_process()
@@ -157,6 +158,11 @@ def main():
             Prompt.ask("\nPress Enter to return")
 
         elif choice == "5":
+            import album_art_fixer
+            album_art_fixer.main()
+            Prompt.ask("\nPress Enter to return")
+
+        elif choice == "6":
             scan_workspace_overview()
             Prompt.ask("\nPress Enter to return")
 

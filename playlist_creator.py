@@ -133,15 +133,15 @@ def import_file_to_spotify(sp, user_id, file_info, custom_name=None):
 
     with Progress(
         SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
         TaskProgressColumn(),
+        BarColumn(),
+        TextColumn("[progress.description]{task.description}"),
         console=console
     ) as progress:
         task = progress.add_task("Searching Spotify...", total=len(songs))
         
         for song in songs:
-            progress.update(task, description=f"Searching: [dim]{song[:30]}...[/dim]")
+            progress.update(task, description=f"Searching: [bold cyan]{song}[/bold cyan]")
             track = search_track(sp, song)
             if track:
                 track_uris.append(track['uri'])
