@@ -245,6 +245,8 @@ def tag_mp3_file(file_path, final_meta, write_cover=True):
 
         tags.add(TMOO(encoding=3, text=final_meta['mood']))
         tags.add(TXXX(encoding=3, desc='MOOD', text=final_meta['mood']))
+        tags.add(TXXX(encoding=3, desc='WM/Mood', text=final_meta['mood']))
+        tags.add(TXXX(encoding=3, desc='WM/MOOD', text=final_meta['mood']))
 
         if write_cover and final_meta['cover_data']:
             tags.add(APIC(
@@ -277,6 +279,7 @@ def tag_m4a_file(file_path, final_meta, write_cover=True):
             audio['tmpo'] = [final_meta['bpm']]
 
         audio['----:com.apple.iTunes:MOOD'] = final_meta['mood'].encode('utf-8')
+        audio['----:com.apple.iTunes:WM/Mood'] = final_meta['mood'].encode('utf-8')
         audio['\xa9cmt'] = [f"Mood: {final_meta['mood']}"]
 
         if write_cover and final_meta['cover_data']:
