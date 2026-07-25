@@ -7,3 +7,9 @@ __pycache__/
 scratch/
 .vscode/
 .idea/
+
+# Exclude all copyrighted audio files and lyrics in audio_library to comply with DMCA
+audio_library/*
+!audio_library/.gitkeep
+playlist_sources/lyrics/*
+!playlist_sources/lyrics/.gitkeep
