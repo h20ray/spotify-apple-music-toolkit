@@ -244,9 +244,7 @@ def tag_mp3_file(file_path, final_meta, write_cover=True):
             tags.add(TBPM(encoding=3, text=str(final_meta['bpm'])))
 
         tags.add(TMOO(encoding=3, text=final_meta['mood']))
-        tags.add(TXXX(encoding=3, desc='MOOD', text=final_meta['mood']))
         tags.add(TXXX(encoding=3, desc='WM/Mood', text=final_meta['mood']))
-        tags.add(TXXX(encoding=3, desc='WM/MOOD', text=final_meta['mood']))
 
         if write_cover and final_meta['cover_data']:
             tags.add(APIC(
@@ -257,7 +255,8 @@ def tag_mp3_file(file_path, final_meta, write_cover=True):
                 data=final_meta['cover_data']
             ))
 
-        audio.save()
+        # Save as ID3v2.3 for Windows File Explorer compatibility
+        audio.save(v2_version=3)
         return True
     except Exception as e:
         console.print(f"[red]Failed to tag MP3 '{os.path.basename(file_path)}': {e}[/red]")
