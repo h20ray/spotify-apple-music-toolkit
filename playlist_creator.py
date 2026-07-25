@@ -284,7 +284,8 @@ def main():
     console.print(Panel(
         "[bold cyan]SPOTIFY ACCOUNT LOGIN[/bold cyan]\n"
         "[dim]Option 2 requires playlist creation permissions on your Spotify account.\n"
-        "Your web browser will open automatically to authorize access.\n"
+        "Your web browser will open automatically to authorize access.\n\n"
+        "Important: Ensure 'http://127.0.0.1:8888/callback' is added in your Spotify Developer Dashboard under App Settings > Redirect URIs.\n"
         "If prompted, log in and copy the redirected URL back to the terminal.[/dim]",
         border_style="yellow"
     ))
