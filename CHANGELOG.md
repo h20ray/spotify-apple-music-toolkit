@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.1] — 2026-07-27
+
+### Changed
+- Split large modules into packages:
+  - `toolkit.playlists.apple_music` → scoring / search / cloud / menu / state
+  - `toolkit.audio.tagger` → metadata_fetch / bpm / mood / writer / processor
+  - `toolkit.audio.artwork` → sources / embed / processor
+- Public imports unchanged (`toolkit.playlists.apple_music`, `toolkit.audio.tagger`, `toolkit.audio.artwork`)
+
 ## [1.0.0] — 2026-07-26
 
 ### Added

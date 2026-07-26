@@ -17,8 +17,11 @@ main.py
 | Package | Role |
 |---------|------|
 | `toolkit.core` | Paths, env, HTTP session/proxy, logging, shared constants |
-| `toolkit.audio` | Unified metadata reader; tagger (Spotify + BPM + mood); artwork; LRC lyrics |
-| `toolkit.playlists` | Text → playlist for Spotify & Apple Music; parse/sanitize; export TSV/M3U8/XML |
+| `toolkit.audio` | Unified metadata reader; LRC lyrics |
+| `toolkit.audio.tagger` | Package: `metadata_fetch`, `bpm`, `mood`, `writer`, `processor` |
+| `toolkit.audio.artwork` | Package: `sources`, `embed`, `processor` |
+| `toolkit.playlists` | Spotify playlist creator; parse/sanitize; export TSV/M3U8/XML |
+| `toolkit.playlists.apple_music` | Package: `scoring`, `search`, `cloud`, `menu`, `state` |
 | `toolkit.ui` | Dashboard menu only |
 
 ## Data flow
