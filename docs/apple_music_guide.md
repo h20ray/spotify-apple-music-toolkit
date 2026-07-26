@@ -1,14 +1,14 @@
-# 🍎 Apple Music Playlist Creator Guide
+# Apple Music Playlist Creator Guide
 
 The **Apple Music Playlist Creator** module (`apple_music_playlist_creator.py`) converts text files containing song lists into official playlists directly inside your **Apple Music Account** (Cloud Sync) without needing third-party websites or desktop app playlist imports.
 
 ---
 
-## 🔑 1-Time Setup Guide: Getting Your Apple Music Token
+## 1-Time Setup Guide: Getting Your Apple Music Token
 
 To allow Python to create playlists directly in your Apple Music account, retrieve your `media-user-token` once:
 
-1. Open your web browser (Chrome, Edge, or Brave) and go to **[https://music.apple.com](https://music.apple.com)**.
+1. Open your web browser (Chrome, Edge, Brave, or Safari) and go to **[https://music.apple.com](https://music.apple.com)**.
 2. Log in with your **Apple ID** (Apple Music subscription account).
 3. Press **F12** on your keyboard to open Developer Tools.
 4. Click on the **Application** tab at the top bar.
@@ -21,13 +21,13 @@ To allow Python to create playlists directly in your Apple Music account, retrie
 
 ---
 
-## 📝 How to Use
+## How to Use
 
 ### 1. Add Text Song Lists
-Place your text files (`.txt`) into the **`playlist_sources/`** directory.
+Place your text files (`.txt`) into the **`playlist_sources/source_text_files/`** directory.
 Each line should be a song name, optionally with the artist name:
 
-*Example: `playlist_sources/international_songs.txt`*
+*Example: `playlist_sources/source_text_files/international_songs.txt`*
 ```text
 Back to December - Taylor Swift
 360 - Charli xcx
@@ -36,15 +36,33 @@ Always - Daniel Caesar
 ```
 
 ### 2. Run Main Menu
-Run `main.py` in PowerShell or Terminal:
+
+#### Windows:
 ```powershell
 python main.py
 ```
+
+#### macOS & Linux:
+```bash
+python3 main.py
+```
+
 Select **Option 3: Apple Music Playlist Creator**.
 
 ---
 
-## 🧠 Advanced Features
+## Network & Proxy Configuration (Multi-OS)
+
+If running behind a corporate or VPN proxy, add proxy settings to your `.env` file:
+```env
+HTTP_PROXY=http://127.0.0.1:7890
+HTTPS_PROXY=http://127.0.0.1:7890
+```
+`network_utils.py` automatically routes Apple Music API requests through your proxy.
+
+---
+
+## Advanced Features
 
 ### 1. Official Apple Music Catalog Engine
 Queries Apple Music's official Catalog API (`amp-api.music.apple.com/v1/catalog/us/search`) to retrieve exact Apple Music Catalog Song IDs with zero rate-limit blocks.

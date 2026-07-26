@@ -1,10 +1,10 @@
-# 🎧 Spotify Playlist Creator Guide
+# Spotify Playlist Creator Guide
 
 The **Spotify Playlist Creator** module (`playlist_creator.py`) converts text files containing song lists into official playlists directly on your **Spotify Account** using the official Spotipy API.
 
 ---
 
-## 🔑 1-Time Setup Guide: Spotify Developer Credentials
+## 1-Time Setup Guide: Spotify Developer Credentials
 
 To enable Spotify integration:
 
@@ -25,33 +25,51 @@ To enable Spotify integration:
 
 ---
 
-## 📝 How to Use
+## How to Use
 
 ### 1. Add Text Song Lists
-Place your text files (`.txt`) into the **`playlist_sources/`** directory:
+Place your text files (`.txt`) into the **`playlist_sources/source_text_files/`** directory:
 
 ```text
-playlist_sources/
+playlist_sources/source_text_files/
 ├── my_favorites.txt
 └── workout_playlist.txt
 ```
 
 ### 2. Run Main Menu
-Run `main.py` in PowerShell or Terminal:
+
+#### Windows:
 ```powershell
 python main.py
 ```
+
+#### macOS & Linux:
+```bash
+python3 main.py
+```
+
 Select **Option 2: Spotify Playlist Creator**.
 
 ### 3. Interactive Menu Options
-- **View Available Text Files**: Scans and displays available song lists in `playlist_sources/`.
+- **View Available Text Files**: Scans and displays available song lists in `playlist_sources/source_text_files/`.
 - **Select One File**: Converts a single text file into a Spotify playlist with custom name options.
 - **Create All Files (Batch Mode)**: Processes all text files sequentially.
 - **Public / Private Toggle**: Choose whether created playlists are Public or Private on your account.
 
 ---
 
-## 📂 Export Backup Files
+## Network & Proxy Configuration (Multi-OS)
+
+If running behind a corporate proxy or VPN, add proxy configurations to your `.env` file:
+```env
+HTTP_PROXY=http://127.0.0.1:7890
+HTTPS_PROXY=http://127.0.0.1:7890
+```
+`network_utils.py` automatically configures Spotipy requests through your proxy.
+
+---
+
+## Export Backup Files
 
 In addition to creating the playlist on your Spotify account, backup files are automatically saved in **`playlist_exports/spotify/`**:
 - **`_spotify.m3u8`**: Standard M3U playlist file containing Spotify track URIs.

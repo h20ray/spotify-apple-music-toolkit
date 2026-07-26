@@ -1,0 +1,63 @@
+"""
+Core Configuration and Network utilities.
+"""
+
+from .config import (
+    BASE_DIR,
+    CONFIG_DIR,
+    KEYWORDS_FILE,
+    PLAYLIST_SOURCES_DIR,
+    SOURCE_TEXT_FILES_DIR,
+    REPORTS_DIR,
+    AUDIO_LIBRARY_DIR,
+    CACHE_DIR,
+    PLAYLIST_EXPORTS_DIR,
+    EXPORT_APPLE_MUSIC_DIR,
+    EXPORT_SPOTIFY_DIR,
+    EXPORT_LYRICS_DIR,
+    SPOTIPY_CLIENT_ID,
+    SPOTIPY_CLIENT_SECRET,
+    SPOTIPY_REDIRECT_URI,
+    APPLE_MUSIC_USER_TOKEN,
+    APPLE_MUSIC_DEVELOPER_TOKEN,
+    DEFAULT_KEYWORDS,
+    ensure_all_folders,
+    load_keywords_config,
+    get_all_txt_files,
+)
+from .network import (
+    get_network_session,
+    get_proxy_config,
+    http_get,
+    http_post,
+    configure_socket_ipv4_fallback,
+)
+
+__all__ = [
+    "BASE_DIR",
+    "CONFIG_DIR",
+    "KEYWORDS_FILE",
+    "PLAYLIST_SOURCES_DIR",
+    "SOURCE_TEXT_FILES_DIR",
+    "REPORTS_DIR",
+    "AUDIO_LIBRARY_DIR",
+    "CACHE_DIR",
+    "PLAYLIST_EXPORTS_DIR",
+    "EXPORT_APPLE_MUSIC_DIR",
+    "EXPORT_SPOTIFY_DIR",
+    "EXPORT_LYRICS_DIR",
+    "SPOTIPY_CLIENT_ID",
+    "SPOTIPY_CLIENT_SECRET",
+    "SPOTIPY_REDIRECT_URI",
+    "APPLE_MUSIC_USER_TOKEN",
+    "APPLE_MUSIC_DEVELOPER_TOKEN",
+    "DEFAULT_KEYWORDS",
+    "ensure_all_folders",
+    "load_keywords_config",
+    "get_all_txt_files",
+    "get_network_session",
+    "get_proxy_config",
+    "http_get",
+    "http_post",
+    "configure_socket_ipv4_fallback",
+]

@@ -1,85 +1,16 @@
-import sys
+"""
+Legacy / Standalone Spotify Playlist Script.
+Delegates to toolkit.playlists.spotify for client and search operations.
+"""
+
 import os
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
-from dotenv import load_dotenv
-
-# Force UTF-8 stdout encoding on Windows
-if sys.platform == 'win32':
-    sys.stdout.reconfigure(encoding='utf-8')
-
-# Load environment variables from .env file
-load_dotenv()
-
-# ==========================================
-# CREDENTIALS & CONFIGURATION
-# ==========================================
-CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
-CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
-REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI', 'http://127.0.0.1:8888/callback')
-SCOPE = 'playlist-modify-public playlist-modify-private'
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PLAYLIST_SOURCES_DIR = os.path.join(BASE_DIR, 'playlist_sources')
-
-def get_spotify_client():
-    """Authenticate and return Spotipy client instance using SpotifyOAuth."""
-    print(f"Connecting to Spotify using Redirect URI: {REDIRECT_URI} ...")
-    
-    if not CLIENT_ID or not CLIENT_SECRET:
-        print("❌ Error: SPOTIPY_CLIENT_ID or SPOTIPY_CLIENT_SECRET is missing from .env file!")
-        sys.exit(0)
-        
-    auth_manager = SpotifyOAuth(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-        redirect_uri=REDIRECT_URI,
-        scope=SCOPE,
-        open_browser=True
-    )
-    return spotipy.Spotify(auth_manager=auth_manager)
-
-def load_songs_from_file(file_path):
-    """Load song entries from a txt file."""
-    if not os.path.exists(file_path):
-        print(f"File not found: {file_path}")
-        return []
-    
-    songs = []
-    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-        for line in f:
-            cleaned = line.strip()
-            if cleaned and not cleaned.startswith("==="):
-                songs.append(cleaned)
-    return songs
-
-def search_track(sp, song_line):
-    """Search for a track on Spotify by 'Title - Artist' or query string."""
-    if ' - ' in song_line:
-        parts = song_line.split(' - ', 1)
-        title, artist = parts[0].strip(), parts[1].strip()
-        query = f"track:{title} artist:{artist}"
-        try:
-            results = sp.search(q=query, limit=1, type='track')
-            items = results.get('tracks', {}).get('items', [])
-            if items:
-                return items[0]
-        except Exception:
-            pass
-    
-    try:
-        results = sp.search(q=song_line, limit=1, type='track')
-        items = results.get('tracks', {}).get('items', [])
-        if items:
-            return items[0]
-    except Exception as e:
-        print(f"   Search error for '{song_line}': {e}")
-    
-    return None
+import sys
+from toolkit.playlists.spotify import get_spotify_client, search_track, parse_songs
+from toolkit.core import SOURCE_TEXT_FILES_DIR, PLAYLIST_SOURCES_DIR
 
 def create_playlist_from_file(sp, user_id, playlist_name, file_path, public=True):
     """Creates a Spotify playlist from a given txt file."""
-    songs = load_songs_from_file(file_path)
+    songs = parse_songs(file_path)
     if not songs:
         print(f"No songs found in {file_path}.")
         return
@@ -132,8 +63,13 @@ def main():
     display_name = user_info.get('display_name', user_id)
     print(f"Logged in as Spotify User: {display_name} ({user_id})\n")
 
-    local_txt = os.path.join(PLAYLIST_SOURCES_DIR, 'local_songs.txt')
-    intl_txt = os.path.join(PLAYLIST_SOURCES_DIR, 'international_songs.txt')
+    local_txt = os.path.join(SOURCE_TEXT_FILES_DIR, 'local_songs.txt')
+    if not os.path.exists(local_txt):
+        local_txt = os.path.join(PLAYLIST_SOURCES_DIR, 'local_songs.txt')
+
+    intl_txt = os.path.join(SOURCE_TEXT_FILES_DIR, 'international_songs.txt')
+    if not os.path.exists(intl_txt):
+        intl_txt = os.path.join(PLAYLIST_SOURCES_DIR, 'international_songs.txt')
 
     if os.path.exists(local_txt):
         create_playlist_from_file(sp, user_id, "Local Songs (Indonesia)", local_txt, public=True)

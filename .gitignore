@@ -1,4 +1,5 @@
 .env
+.cache/
 .cache
 .cache-*
 .spotipy-cache*
@@ -8,8 +9,13 @@ scratch/
 .vscode/
 .idea/
 
+# Ignore playlist search cache files
+playlist_exports/**/search_cache.json
+playlist_exports/**/apple_music_search_cache.json
+
 # Exclude all copyrighted audio files and lyrics in audio_library to comply with DMCA
 audio_library/*
 !audio_library/.gitkeep
 playlist_sources/lyrics/*
 !playlist_sources/lyrics/.gitkeep
+/temp

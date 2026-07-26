@@ -1,10 +1,10 @@
-# 🎵 Audio Tagger & Album Art Fixer Guide
+# Audio Tagger & Album Art Fixer Guide
 
 The **Audio Tagger** (`audio_tagger.py`) and **Album Art Fixer** (`album_art_fixer.py`) modules tag local audio files (`.mp3`, `.m4a`), calculate physical audio tempo (BPM), identify style/mood, and embed high-resolution 1000x1000 studio cover art into your music files.
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 ### 1. High-Resolution Album Cover Art Fixer (`album_art_fixer.py`)
 - Searches iTunes and music databases for official 1000x1000 high-res cover art.
@@ -21,9 +21,12 @@ The **Audio Tagger** (`audio_tagger.py`) and **Album Art Fixer** (`album_art_fix
 ### 4. Safeguard Mode
 - Preserves existing tags (Title, Artist, Album, Genre) and only fills in missing or empty metadata fields.
 
+### 5. Detailed Execution Reports
+- Writes full execution logs to **`reports/audio_tagging_report.txt`** and **`reports/album_art_fixer_report.txt`**, keeping `playlist_sources/` clean.
+
 ---
 
-## 📝 How to Use
+## How to Use
 
 ### 1. Add Audio Files
 Place your `.mp3` or `.m4a` audio files into the **`audio_library/`** folder:
@@ -34,9 +37,16 @@ audio_library/
 ```
 
 ### 2. Run Main Menu
-Run `main.py` in PowerShell or Terminal:
+
+#### Windows:
 ```powershell
 python main.py
 ```
+
+#### macOS & Linux:
+```bash
+python3 main.py
+```
+
 - Select **Option 1: Complete Process Audio Library** to tag metadata, calculate BPM, embed cover art, AND download lyrics in 1 click!
 - Select **Option 4: Separate Utilities Menu** -> **Album Art Fixer** to only search and update album cover art.
