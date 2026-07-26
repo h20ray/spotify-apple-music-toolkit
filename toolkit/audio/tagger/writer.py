@@ -81,4 +81,3 @@ def tag_m4a_file(file_path: str, final_meta: dict[str, Any], write_cover: bool =
     except (MutagenError, OSError, KeyError, TypeError) as e:
         logger.warning(f"Failed tagging M4A {file_path}: {e}")
         return False
-

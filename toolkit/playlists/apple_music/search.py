@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 import os
 import time
-from typing import Any, Optional
 
 from toolkit.core import ensure_all_folders, http_get
 from toolkit.core.constants import (
@@ -37,7 +36,8 @@ def ensure_folders() -> None:
 def load_search_cache():
     """Load local search cache from .cache/ directory (with fallback to legacy cache) and evict invalid entries."""
     global SEARCH_CACHE
-    target_path = CACHE_FILE if os.path.exists(CACHE_FILE) else (LEGACY_CACHE_FILE if os.path.exists(LEGACY_CACHE_FILE) else None)
+    target_path = CACHE_FILE if os.path.exists(CACHE_FILE) else (
+        LEGACY_CACHE_FILE if os.path.exists(LEGACY_CACHE_FILE) else None)
 
     if target_path:
         try:
@@ -68,6 +68,7 @@ def save_search_cache():
     except OSError as e:
         logger.warning(f"Failed saving Apple Music search cache: {e}")
 
+
 def clear_search_cache_for_songs(songs=None):
     """Clear cached search results for specific songs or entire cache."""
     global SEARCH_CACHE
@@ -77,6 +78,7 @@ def clear_search_cache_for_songs(songs=None):
     else:
         SEARCH_CACHE = {}
     save_search_cache()
+
 
 def search_apple_music_track(song_line, is_trim_retry=False):
     """
@@ -274,6 +276,7 @@ def search_apple_music_track(song_line, is_trim_retry=False):
     SEARCH_CACHE[song_line] = None
     return None
 
+
 def process_track_batch(songs, progress=None, task=None):
     """
     Search Apple Music tracks using controlled execution
@@ -299,11 +302,13 @@ def process_track_batch(songs, progress=None, task=None):
             if i % CACHE_SAVE_INTERVAL == 0:
                 save_search_cache()
     except KeyboardInterrupt:
-        console.print("\n[bold yellow]Process interrupted by user (Ctrl+C). Saving current search progress to cache...[/bold yellow]")
+        console.print(
+            "\n[bold yellow]Process interrupted by user (Ctrl+C). "
+            "Saving current search progress to cache...[/bold yellow]"
+        )
         save_search_cache()
         raise
     finally:
         save_search_cache()
 
     return results_map
-

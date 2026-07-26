@@ -147,5 +147,3 @@ def fetch_artwork_bytes(artwork_url: str) -> Optional[bytes]:
             logger.debug(f"Artwork download failed for {test_url}: {e}")
 
     return None
-
-

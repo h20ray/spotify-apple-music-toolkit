@@ -1,7 +1,8 @@
 """
 Network & Proxy Utilities Module
 Multi-OS compatible network handler for Spotify - Apple Music Toolkit.
-Handles system & .env proxies, SSL cert verification, User-Agent rotation, and IPv4/IPv6 fallback across Windows, macOS, and Linux.
+Handles system & .env proxies, SSL cert verification, User-Agent rotation,
+and IPv4/IPv6 fallback across Windows, macOS, and Linux.
 """
 
 from __future__ import annotations

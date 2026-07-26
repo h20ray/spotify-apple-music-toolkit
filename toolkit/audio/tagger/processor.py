@@ -6,7 +6,6 @@ import os
 import warnings
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
-from typing import Any, Optional
 
 from rich.console import Console
 from rich.live import Live
@@ -35,11 +34,15 @@ logger = get_logger(__name__)
 def select_tagging_mode():
     """Prompt user for Tagging Mode selection."""
     console.print("\n[bold yellow]TAG PROTECTION SETTINGS:[/bold yellow]")
-    console.print(" [bold cyan]1[/bold cyan] [bold green]Safeguard Mode (Fill missing tags only - Protect existing tags)[/bold green] [Recommended]")
+    console.print(
+        " [bold cyan]1[/bold cyan] [bold green]Safeguard Mode "
+        "(Fill missing tags only - Protect existing tags)[/bold green] [Recommended]"
+    )
     console.print(" [bold cyan]2[/bold cyan] Overwrite Mode (Replace all tags with Spotify data)")
-    
+
     choice = Prompt.ask("\nSelect Mode", choices=["1", "2"], default="1")
     return choice
+
 
 def _process_single_tagger_worker(fname, folder_path, mode, sp, thread_slot, progress, master_task, worker_status):
     """Worker function for tagging individual audio files concurrently."""
@@ -47,16 +50,20 @@ def _process_single_tagger_worker(fname, folder_path, mode, sp, thread_slot, pro
     file_base = os.path.splitext(fname)[0]
 
     existing = read_all_existing_metadata(file_path)
-    query = f"{existing['title']} {existing['artist']}".strip() if (existing['title'] and existing['artist']) else file_base.replace('_', ' ')
+    if existing["title"] and existing["artist"]:
+        query = f"{existing['title']} {existing['artist']}".strip()
+    else:
+        query = file_base.replace("_", " ")
     query = pre_sanitize_song_line(query)
 
     with STATUS_LOCK:
-        worker_status[thread_slot] = f"[bold cyan]Thread #{thread_slot+1:02d}[/bold cyan] Tagging: [white]{query[:50]}[/white]"
+        worker_status[thread_slot] = f"[bold cyan]Thread #{thread_slot
+                                                           + 1:02d}[/bold cyan] Tagging: [white]{query[:50]}[/white]"
 
     try:
         bpm_val = existing['bpm'] or detect_physical_bpm(file_path)
         sp_meta = search_spotify_metadata(sp, query)
-        
+
         if not sp_meta:
             sp_meta = {
                 'title': existing['title'] or file_base,
@@ -113,7 +120,12 @@ def _process_single_tagger_worker(fname, folder_path, mode, sp, thread_slot, pro
             'bpm': bpm_val,
             'action_desc': action_desc,
             'success': success,
-            'report': f"{fname} | {final_title} - {final_artist} | {final_album} | {final_genre} | {final_mood} | {bpm_val} BPM | {action_desc}" if success else f"{fname} | FAILED"
+            "report": (
+                f"{fname} | {final_title} - {final_artist} | {final_album} | "
+                f"{final_genre} | {final_mood} | {bpm_val} BPM | {action_desc}"
+                if success
+                else f"{fname} | FAILED"
+            ),
         }
     finally:
         with STATUS_LOCK:
@@ -147,8 +159,8 @@ def process_audio_folder(folder_path=AUDIO_LIBRARY_DIR, mode=None, max_workers=D
         return
 
     console.print(
-        f"\n[bold green]Found {len(audio_files)} audio file(s) | Multi-Threaded Engine ({max_workers} threads)...[/bold green]"
-    )
+        f"\n[bold green]Found {
+            len(audio_files)} audio file(s) | Multi-Threaded Engine ({max_workers} threads)...[/bold green]")
 
     if not mode:
         mode = select_tagging_mode()
@@ -163,7 +175,7 @@ def process_audio_folder(folder_path=AUDIO_LIBRARY_DIR, mode=None, max_workers=D
     )
     master_task = progress.add_task("Overall", total=len(audio_files))
 
-    worker_status = [f"[dim]Thread #{i+1:02d}: Active...[/dim]" for i in range(max_workers)]
+    worker_status = [f"[dim]Thread #{i + 1:02d}: Active...[/dim]" for i in range(max_workers)]
 
     def build_renderable():
         tbl = Table.grid(padding=(0, 0))
@@ -179,7 +191,16 @@ def process_audio_folder(folder_path=AUDIO_LIBRARY_DIR, mode=None, max_workers=D
             future_to_file = {}
             for idx, fname in enumerate(audio_files):
                 thread_slot = idx % max_workers
-                future = executor.submit(_process_single_tagger_worker, fname, folder_path, mode, sp, thread_slot, progress, master_task, worker_status)
+                future = executor.submit(
+                    _process_single_tagger_worker,
+                    fname,
+                    folder_path,
+                    mode,
+                    sp,
+                    thread_slot,
+                    progress,
+                    master_task,
+                    worker_status)
                 future_to_file[future] = fname
 
             for future in as_completed(future_to_file):
@@ -205,11 +226,11 @@ def process_audio_folder(folder_path=AUDIO_LIBRARY_DIR, mode=None, max_workers=D
         if not os.path.exists(REPORTS_DIR):
             os.makedirs(REPORTS_DIR)
         report_path = os.path.join(REPORTS_DIR, "audio_tagging_report.txt")
-        
+
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
+
         with open(report_path, "w", encoding="utf-8") as rf:
-            rf.write(f"=== MULTI-THREADED AUDIO TAGGING REPORT ===\n")
+            rf.write("=== MULTI-THREADED AUDIO TAGGING REPORT ===\n")
             rf.write(f"Date & Time: {timestamp}\n")
             rf.write(f"Total Processed Tracks: {len(audio_files)}\n")
             rf.write(f"Worker Threads Used: {max_workers}\n\n")
@@ -217,8 +238,11 @@ def process_audio_folder(folder_path=AUDIO_LIBRARY_DIR, mode=None, max_workers=D
             rf.write("-" * 80 + "\n")
             for r in results:
                 rf.write(f"{r['report']}\n")
-        
-        console.print(f"[bold green]Full report saved to:[/bold green] [underline magenta]reports/audio_tagging_report.txt[/underline magenta]\n")
+
+        console.print(
+            "[bold green]Full report saved to:[/bold green] "
+            "[underline magenta]reports/audio_tagging_report.txt[/underline magenta]\n"
+        )
     except OSError as e:
         logger.warning(f"Could not write report file: {e}")
         console.print(f"[dim yellow]Notice: Could not write report file: {e}[/dim yellow]")
@@ -229,7 +253,8 @@ def main() -> None:
     console.print(
         Panel(
             "[bold cyan]SMART MULTI-THREADED AUDIO TAGGER[/bold cyan]\n"
-            "[bold green]Updates song tags, calculates song tempo (BPM), and embeds artwork via Multi-Threading.[/bold green]",
+            "[bold green]Updates song tags, calculates song tempo (BPM), "
+            "and embeds artwork via Multi-Threading.[/bold green]",
             border_style="green",
         )
     )
@@ -244,8 +269,6 @@ def main() -> None:
         workers_val = DEFAULT_MAX_WORKERS
 
     process_audio_folder(AUDIO_LIBRARY_DIR, max_workers=workers_val)
-
-
 
 
 if __name__ == "__main__":

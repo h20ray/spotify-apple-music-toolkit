@@ -10,7 +10,6 @@ from __future__ import annotations
 import os
 import re
 import unicodedata
-from typing import Optional
 
 from toolkit.core import (
     PLAYLIST_SOURCES_DIR,
@@ -27,6 +26,7 @@ KARAOKE_TRIBUTE_KEYWORDS = _KW_CONFIG.get("karaoke_and_tributes", [])
 UNWANTED_VERSION_KEYWORDS = _KW_CONFIG.get("unwanted_versions", [])
 UNWANTED_EDIT_KEYWORDS = _KW_CONFIG.get("unwanted_edits", [])
 
+
 def refresh_keywords():
     """Reload keywords from config/keywords.json at runtime if modified."""
     global _KW_CONFIG, COMPILATION_KEYWORDS, KARAOKE_TRIBUTE_KEYWORDS, UNWANTED_VERSION_KEYWORDS, UNWANTED_EDIT_KEYWORDS
@@ -35,6 +35,7 @@ def refresh_keywords():
     KARAOKE_TRIBUTE_KEYWORDS = _KW_CONFIG.get("karaoke_and_tributes", [])
     UNWANTED_VERSION_KEYWORDS = _KW_CONFIG.get("unwanted_versions", [])
     UNWANTED_EDIT_KEYWORDS = _KW_CONFIG.get("unwanted_edits", [])
+
 
 def parse_songs(file_path):
     """Parse track titles from text file."""
@@ -47,6 +48,7 @@ def parse_songs(file_path):
             if cleaned and not cleaned.startswith("==="):
                 songs.append(cleaned)
     return songs
+
 
 def clean_string(text):
     """Normalize string for comparison, stripping accents and expanding explicit censorship masks."""
@@ -67,17 +69,24 @@ def clean_string(text):
     text = re.sub(r'[\(\)\[\]\{\}\-\_\,\.\:\;\"\'\!\?\/\\]', ' ', text)
     return ' '.join(text.split())
 
+
 def pre_sanitize_song_line(line):
     """Pre-sanitize raw playlist text line (strip track numbers, video tags, extra spaces)."""
     if not line:
         return ""
     # Strip leading track numbers like '01. ', '1 - ', '[01] ', '01) '
-    l = re.sub(r'^\s*\[?\d+\]?[\.\-\)]\s*', '', line.strip())
+    line_s = re.sub(r'^\s*\[?\d+\]?[\.\-\)]\s*', '', line.strip())
     # Strip video/audio tags like [Official Audio], (Official Video), (Lyrics), (Audio), (Visualizer)
-    l = re.sub(r'[\(\[\{]\s*(?:Official|Audio|Video|Lyrics|Visualizer|HD|4K|Topic).+?[\)\]\}]', '', l, flags=re.IGNORECASE)
+    line_s = re.sub(
+        r'[\(\[\{]\s*(?:Official|Audio|Video|Lyrics|Visualizer|HD|4K|Topic).+?[\)\]\}]',
+        '',
+        line_s,
+        flags=re.IGNORECASE,
+    )
     # Strip leading/trailing quotes and normalize spacing
-    l = l.strip('"\' ')
-    return re.sub(r'\s+', ' ', l).strip()
+    line_s = line_s.strip("\"' ")
+    return re.sub(r"\s+", " ", line_s).strip()
+
 
 def extract_artist_title(song_line):
     """Extract (artist, title) tuple from song line if ' - ' delimiter is present, else (None, title)."""
@@ -86,6 +95,7 @@ def extract_artist_title(song_line):
         parts = clean_line.split(' - ', 1)
         return parts[0].strip(), parts[1].strip()
     return None, clean_line
+
 
 def verify_title_match(target_title, candidate_title):
     """
@@ -128,11 +138,13 @@ def verify_title_match(target_title, candidate_title):
     ratio = matched_count / len(t_words)
 
     # Strict rule:
-    # For titles with 1 or 2 core words, ALL core words must match unless target title is long (3+ words) where 65%+ match is allowed.
+    # For titles with 1 or 2 core words, ALL core words must match unless
+    # target title is long (3+ words) where 65%+ match is allowed.
     if len(t_words) <= 2:
         return matched_count == len(t_words)
     else:
         return ratio >= WORD_MATCH_THRESHOLD
+
 
 def verify_artist_match(target_artist, candidate_artist):
     """
@@ -151,8 +163,12 @@ def verify_artist_match(target_artist, candidate_artist):
     if ta_clean in ca_clean or ca_clean in ta_clean:
         return True
 
-    ta_primary = re.split(r'\s*(?:&|,|/|\\|\bfeat\.\b|\bft\.\b|\bfeaturing\b|\bwith\b|\bvs\.\b|\bvs\b|\bx\b)\s*', ta_clean)[0].strip()
-    ca_primary = re.split(r'\s*(?:&|,|/|\\|\bfeat\.\b|\bft\.\b|\bfeaturing\b|\bwith\b|\bvs\.\b|\bvs\b|\bx\b)\s*', ca_clean)[0].strip()
+    ta_primary = re.split(
+        r'\s*(?:&|,|/|\\|\bfeat\.\b|\bft\.\b|\bfeaturing\b|\bwith\b|\bvs\.\b|\bvs\b|\bx\b)\s*',
+        ta_clean)[0].strip()
+    ca_primary = re.split(
+        r'\s*(?:&|,|/|\\|\bfeat\.\b|\bft\.\b|\bfeaturing\b|\bwith\b|\bvs\.\b|\bvs\b|\bx\b)\s*',
+        ca_clean)[0].strip()
 
     if ta_primary == ca_primary:
         return True
@@ -179,6 +195,7 @@ def verify_artist_match(target_artist, candidate_artist):
 
     return True
 
+
 def verify_track_match(song_line, candidate_title, candidate_artist=None):
     """
     Verify if candidate track title & artist strictly match target song line.
@@ -203,6 +220,7 @@ def verify_track_match(song_line, candidate_title, candidate_artist=None):
         return False
     else:
         return verify_title_match(clean_line, candidate_title)
+
 
 def generate_search_queries(song_line):
     """Smart parser to generate clean search queries for both Artist-Title and Title-Artist formats."""
@@ -241,8 +259,14 @@ def generate_search_queries(song_line):
         queries.append(f"{p1_clean} {p2_clean}".strip())
         queries.append(f"{p2_clean} {p1_clean}".strip())
 
-        p1_primary = re.split(r'\s*(?:&|,|/|\\|\bfeat\.\b|\bft\.\b|\bfeaturing\b|\bwith\b|\bvs\.\b|\bvs\b|\bx\b)\s*', p1_clean, flags=re.IGNORECASE)[0].strip()
-        p2_primary = re.split(r'\s*(?:&|,|/|\\|\bfeat\.\b|\bft\.\b|\bfeaturing\b|\bwith\b|\bvs\.\b|\bvs\b|\bx\b)\s*', p2_clean, flags=re.IGNORECASE)[0].strip()
+        p1_primary = re.split(
+            r'\s*(?:&|,|/|\\|\bfeat\.\b|\bft\.\b|\bfeaturing\b|\bwith\b|\bvs\.\b|\bvs\b|\bx\b)\s*',
+            p1_clean,
+            flags=re.IGNORECASE)[0].strip()
+        p2_primary = re.split(
+            r'\s*(?:&|,|/|\\|\bfeat\.\b|\bft\.\b|\bfeaturing\b|\bwith\b|\bvs\.\b|\bvs\b|\bx\b)\s*',
+            p2_clean,
+            flags=re.IGNORECASE)[0].strip()
 
         queries.append(f"{p1_primary} {p2_clean}".strip())
         queries.append(f"{p2_primary} {p1_clean}".strip())
@@ -273,6 +297,7 @@ def generate_search_queries(song_line):
             dedup_queries.append(q)
 
     return dedup_queries
+
 
 def scan_playlist_files():
     """Scan playlist text files in source_text_files or fallback directory."""

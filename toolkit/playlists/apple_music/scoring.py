@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import re
-from typing import Any
 
 from toolkit.core.constants import (
     APPLE_BONUS_ARTIST_TITLE_MATCH,
@@ -133,7 +132,8 @@ def score_track_candidate(item, song_line, user_wants_remix, user_wants_live):
 
     full_candidate_all = f"{tn_clean} {an_clean} {album_clean}"
 
-    user_wants_karaoke = "karaoke" in song_line.lower() or "tribute" in song_line.lower() or "cover" in song_line.lower()
+    sl = song_line.lower()
+    user_wants_karaoke = "karaoke" in sl or "tribute" in sl or "cover" in sl
     if not user_wants_karaoke:
         for kw in KARAOKE_TRIBUTE_KEYWORDS:
             if kw in full_candidate_all:
@@ -170,4 +170,3 @@ def score_track_candidate(item, song_line, user_wants_remix, user_wants_live):
             break
 
     return score
-

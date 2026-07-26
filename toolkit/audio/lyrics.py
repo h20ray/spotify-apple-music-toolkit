@@ -94,7 +94,7 @@ def format_lrc_with_headers(raw_lyrics, title, artist="", album=""):
     """
     if not raw_lyrics:
         return ""
-    
+
     clean_raw = raw_lyrics.lstrip()
     headers = []
     if title and not clean_raw.startswith("[ti:"):
@@ -103,16 +103,17 @@ def format_lrc_with_headers(raw_lyrics, title, artist="", album=""):
         headers.append(f"[ar:{artist}]")
     if album and "[al:" not in clean_raw[:200]:
         headers.append(f"[al:{album}]")
-        
+
     if headers:
         header_block = "\n".join(headers) + "\n"
         return header_block + clean_raw
     return clean_raw
 
+
 def fetch_synced_lrc(track_name, artist_name="", fallback_album=""):
     """Fetch synchronized .lrc lyrics."""
     headers = {"User-Agent": "SpotifyLRCManager/1.0"}
-    
+
     if artist_name:
         params = {"track_name": track_name, "artist_name": artist_name}
         try:
@@ -175,6 +176,7 @@ def save_lrc_file(output_path, lyrics_content):
         console.print(f"[red]Error saving {output_path}: {e}[/red]")
         return False
 
+
 def _process_single_lrc_worker(fname, thread_slot, progress, master_task, worker_status):
     """Worker function for fetching lyrics concurrently for single file."""
     file_path = os.path.join(AUDIO_LIBRARY_DIR, fname)
@@ -199,7 +201,10 @@ def _process_single_lrc_worker(fname, thread_slot, progress, master_task, worker
     disp_text = f"{query_artist} - {query_title}".strip(" -")
 
     with STATUS_LOCK:
-        worker_status[thread_slot] = f"[bold cyan]Thread #{thread_slot+1:02d}[/bold cyan] Fetching LRC: [white]{disp_text[:50]}[/white]"
+        worker_status[thread_slot] = (
+            f"[bold cyan]Thread #{thread_slot + 1:02d}[/bold cyan] "
+            f"Fetching LRC: [white]{disp_text[:50]}[/white]"
+        )
 
     try:
         lyrics, lyric_type, album_name = fetch_synced_lrc(query_title, query_artist, id3_album or "")
@@ -234,7 +239,9 @@ def sync_audio_library_lyrics(max_workers=DEFAULT_MAX_WORKERS):
         console.print(f"[bold yellow]No audio files found in '{AUDIO_LIBRARY_DIR}/'.[/bold yellow]")
         return
 
-    console.print(f"\n[bold green]Syncing Synced Lyrics for {len(audio_files)} audio file(s) | Multi-Threaded Engine ({max_workers} threads)...[/bold green]\n")
+    console.print(
+        f"\n[bold green]Syncing Synced Lyrics for {
+            len(audio_files)} audio file(s) | Multi-Threaded Engine ({max_workers} threads)...[/bold green]\n")
 
     results = []
     progress = Progress(
@@ -246,7 +253,7 @@ def sync_audio_library_lyrics(max_workers=DEFAULT_MAX_WORKERS):
     )
     master_task = progress.add_task("Overall", total=len(audio_files))
 
-    worker_status = [f"[dim]Thread #{i+1:02d}: Active...[/dim]" for i in range(max_workers)]
+    worker_status = [f"[dim]Thread #{i + 1:02d}: Active...[/dim]" for i in range(max_workers)]
 
     def build_renderable():
         tbl = Table.grid(padding=(0, 0))
@@ -262,7 +269,13 @@ def sync_audio_library_lyrics(max_workers=DEFAULT_MAX_WORKERS):
             future_to_file = {}
             for idx, fname in enumerate(audio_files):
                 thread_slot = idx % max_workers
-                future = executor.submit(_process_single_lrc_worker, fname, thread_slot, progress, master_task, worker_status)
+                future = executor.submit(
+                    _process_single_lrc_worker,
+                    fname,
+                    thread_slot,
+                    progress,
+                    master_task,
+                    worker_status)
                 future_to_file[future] = fname
 
             for future in as_completed(future_to_file):
@@ -286,7 +299,8 @@ def sync_audio_library_lyrics(max_workers=DEFAULT_MAX_WORKERS):
 
     exceptions = [r for r in results if not r['success']]
     if exceptions:
-        summary_table = Table(title="[bold yellow]Missing Lyrics Summary[/bold yellow]", border_style="cyan", header_style="bold magenta")
+        summary_table = Table(title="[bold yellow]Missing Lyrics Summary[/bold yellow]",
+                              border_style="cyan", header_style="bold magenta")
         summary_table.add_column("Audio File", style="bold white")
         summary_table.add_column("Search Source", style="dim")
         summary_table.add_column("Status", style="red")
@@ -298,7 +312,7 @@ def sync_audio_library_lyrics(max_workers=DEFAULT_MAX_WORKERS):
         report_path = os.path.join(REPORTS_DIR, "lyrics_download_report.txt")
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with open(report_path, "w", encoding="utf-8") as rf:
-            rf.write(f"=== MULTI-THREADED LYRICS DOWNLOAD REPORT ===\n")
+            rf.write("=== MULTI-THREADED LYRICS DOWNLOAD REPORT ===\n")
             rf.write(f"Date & Time: {timestamp}\n")
             rf.write(f"Total Audio Files: {len(audio_files)}\n")
             rf.write(f"Worker Threads Used: {max_workers}\n\n")
@@ -306,15 +320,19 @@ def sync_audio_library_lyrics(max_workers=DEFAULT_MAX_WORKERS):
             rf.write("-" * 60 + "\n")
             for r in results:
                 rf.write(f"{r['report']}\n")
-        console.print(f"\n[bold green]Report saved to:[/bold green] [underline magenta]reports/lyrics_download_report.txt[/underline magenta]\n")
+        console.print(
+            "\n[bold green]Report saved to:[/bold green] "
+            "[underline magenta]reports/lyrics_download_report.txt[/underline magenta]\n"
+        )
     except OSError as e:
         logger.warning(f"Could not write report file: {e}")
         console.print(f"[dim yellow]Notice: Could not write report file: {e}[/dim yellow]")
 
+
 def sync_playlist_text_lyrics():
     """Download .lrc files for songs listed in a playlist text file."""
     ensure_folders()
-    
+
     txt_candidates = []
     seen_names = set()
 
@@ -392,13 +410,16 @@ def sync_playlist_text_lyrics():
 
             if lyrics:
                 save_lrc_file(lrc_path, lyrics)
-                summary_table.add_row(clean_line, f"[bold green]{lyric_type}[/bold green]", f"playlist_exports/lyrics/{lrc_filename}")
+                summary_table.add_row(clean_line,
+                                      f"[bold green]{lyric_type}[/bold green]",
+                                      f"playlist_exports/lyrics/{lrc_filename}")
             else:
                 summary_table.add_row(clean_line, "[dim red]Not Found[/dim red]", "-")
 
             progress.advance(task)
 
     console.print(summary_table)
+
 
 def search_single_lrc():
     """Search and download .lrc for a single track."""
@@ -428,6 +449,7 @@ def search_single_lrc():
         ))
     else:
         console.print(f"[bold red]Could not find lyrics for '{song_input}'[/bold red]")
+
 
 def main():
     ensure_folders()
@@ -466,6 +488,7 @@ def main():
             Prompt.ask("\nPress Enter to return")
         elif choice == "0":
             break
+
 
 if __name__ == '__main__':
     main()

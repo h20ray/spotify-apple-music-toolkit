@@ -18,5 +18,3 @@ def detect_physical_bpm(file_path: str) -> int:
     except Exception as e:
         logger.warning(f"BPM detection failed for {file_path}: {e}")
         return 0
-
-

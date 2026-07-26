@@ -11,7 +11,14 @@ from typing import Any
 def export_apple_tsv(playlist_name: str, tracks: list[dict[str, Any]], output_path: str) -> None:
     """Export official Apple Music native TSV Text Playlist format (.txt)."""
     with open(output_path, 'w', encoding='utf-8') as f:
-        f.write("Name\tArtist\tComposer\tAlbum\tGenre\tSize\tTime\tDisc Number\tDisc Count\tTrack Number\tTrack Count\tYear\tDate Modified\tDate Added\tBit Rate\tSample Rate\tVolume Adjustment\tKind\tEqualizer\tComments\tPlay Count\tLast Played\tSkip Count\tLast Skipped\tMy Rating\tLocation\n")
+        header = (
+            "Name\tArtist\tComposer\tAlbum\tGenre\tSize\tTime\t"
+            "Disc Number\tDisc Count\tTrack Number\tTrack Count\tYear\t"
+            "Date Modified\tDate Added\tBit Rate\tSample Rate\t"
+            "Volume Adjustment\tKind\tEqualizer\tComments\tPlay Count\t"
+            "Last Played\tSkip Count\tLast Skipped\tMy Rating\tLocation\n"
+        )
+        f.write(header)
 
         for item in tracks:
             title = item.get('trackName', '')
@@ -20,6 +27,7 @@ def export_apple_tsv(playlist_name: str, tracks: list[dict[str, Any]], output_pa
             duration_sec = int(item.get('trackTimeMillis', 0) / 1000)
 
             f.write(f"{title}\t{artist}\t\t{album}\t\t\t{duration_sec}\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n")
+
 
 def export_m3u8(playlist_name: str, tracks: list[dict[str, Any]], output_path: str) -> None:
     """Export Apple Music / Spotify compatible UTF-8 M3U playlist file."""
@@ -34,11 +42,15 @@ def export_m3u8(playlist_name: str, tracks: list[dict[str, Any]], output_path: s
 
             f.write(f"#EXTINF:{duration_sec},{artist} - {title}\n\n")
 
+
 def export_apple_xml(playlist_name: str, tracks: list[dict[str, Any]], output_path: str) -> None:
     """Export iTunes / Apple Music Library XML playlist file."""
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-        f.write('<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n')
+        f.write(
+            '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" '
+            '"http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n'
+        )
         f.write('<plist version="1.0">\n')
         f.write('<dict>\n')
         f.write('    <key>Major Version</key><integer>1</integer>\n')

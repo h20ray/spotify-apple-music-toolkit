@@ -12,5 +12,3 @@ def calculate_mood(primary_genre: str = "Pop") -> str:
     if any(k in genre_lower for k in ["r&b", "soul", "jazz", "lo-fi", "soft"]):
         return "Smooth & Chill"
     return f"{primary_genre} Style"
-
-

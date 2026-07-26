@@ -49,7 +49,7 @@ def _process_single_artwork_worker(
 
     with STATUS_LOCK:
         worker_status[thread_slot] = (
-            f"[bold cyan]Thread #{thread_slot+1:02d}[/bold cyan] Searching Art: [white]{query[:50]}[/white]"
+            f"[bold cyan]Thread #{thread_slot + 1:02d}[/bold cyan] Searching Art: [white]{query[:50]}[/white]"
         )
 
     try:
@@ -86,7 +86,7 @@ def _process_single_artwork_worker(
             "source": source_label,
             "success": success,
             "report": (
-                f"{fname} | {query} | {source_label} | Embedded ({len(img_bytes)//1024} KB)"
+                f"{fname} | {query} | {source_label} | Embedded ({len(img_bytes) // 1024} KB)"
                 if success
                 else f"{fname} | {query} | Embedding Failed"
             ),
@@ -117,8 +117,8 @@ def process_album_art_fixer(folder_path: str = AUDIO_LIBRARY_DIR, max_workers: i
         return
 
     console.print(
-        f"\n[bold green]Found {len(audio_files)} audio file(s) | Multi-Threaded Cover Art Fixer ({max_workers} threads)...[/bold green]"
-    )
+        f"\n[bold green]Found {
+            len(audio_files)} audio file(s) | Multi-Threaded Cover Art Fixer ({max_workers} threads)...[/bold green]")
 
     results: list[dict[str, Any]] = []
     progress = Progress(
@@ -130,7 +130,7 @@ def process_album_art_fixer(folder_path: str = AUDIO_LIBRARY_DIR, max_workers: i
     )
     master_task = progress.add_task("Overall", total=len(audio_files))
 
-    worker_status = [f"[dim]Thread #{i+1:02d}: Active...[/dim]" for i in range(max_workers)]
+    worker_status = [f"[dim]Thread #{i + 1:02d}: Active...[/dim]" for i in range(max_workers)]
 
     def build_renderable():
         tbl = Table.grid(padding=(0, 0))
@@ -223,8 +223,6 @@ def main() -> None:
         workers_val = DEFAULT_MAX_WORKERS
 
     process_album_art_fixer(AUDIO_LIBRARY_DIR, max_workers=workers_val)
-
-
 
 
 if __name__ == "__main__":

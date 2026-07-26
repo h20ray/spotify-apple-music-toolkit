@@ -64,7 +64,7 @@ def select_best_original_track(items):
     """Prioritizes official Studio Albums over Compilations and Various Artists collections."""
     if not items:
         return None
-        
+
     studio_albums = []
     singles = []
     others = []
@@ -75,12 +75,12 @@ def select_best_original_track(items):
         album_type = album.get('album_type', '').lower()
         artists = track.get('artists', [])
         primary_artist = artists[0]['name'].lower() if artists else ""
-        
+
         album_name_lower = album_name.lower()
         is_compilation = (
-            album_type == 'compilation' or
-            any(k in album_name_lower for k in COMPILATION_KEYWORDS) or
-            'various' in primary_artist
+            album_type == 'compilation'
+            or any(k in album_name_lower for k in COMPILATION_KEYWORDS)
+            or 'various' in primary_artist
         )
 
         if not is_compilation:
@@ -100,6 +100,7 @@ def select_best_original_track(items):
     elif others:
         return others[0]
     return items[0]
+
 
 def search_spotify_metadata(sp: spotipy.Spotify, query_text: str) -> Optional[dict[str, Any]]:
     """Fetch track details from Spotify API (with local cache)."""
@@ -176,5 +177,3 @@ def search_spotify_metadata(sp: spotipy.Spotify, query_text: str) -> Optional[di
     except Exception as e:
         logger.warning(f"Unexpected Spotify metadata error for '{query_text}': {e}")
         return None
-
-

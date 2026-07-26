@@ -7,7 +7,6 @@ Uses shared pre-sanitization, query generation, and strict candidate track verif
 from __future__ import annotations
 
 import os
-from typing import Any, Optional
 
 import spotipy
 from rich.console import Console
@@ -42,9 +41,11 @@ logger = get_logger(__name__)
 SCOPE = "playlist-modify-public playlist-modify-private"
 SOURCE_FOLDER_NAME = "playlist_sources"
 
+
 def ensure_source_folder():
     """Ensure the playlist sources directory exists."""
     ensure_all_folders()
+
 
 def get_spotify_client():
     """Authenticate and return Spotipy client instance with clean error handling."""
@@ -64,7 +65,7 @@ def get_spotify_client():
             border_style="red"
         ))
         return None
-        
+
     try:
         session = get_network_session()
         auth_manager = SpotifyOAuth(
@@ -82,23 +83,34 @@ def get_spotify_client():
         console.print(
             Panel(
                 f"[bold red]Spotify Authentication Error:[/bold red] {e}\n\n"
-                "[yellow]Please check that your SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET in .env are correct.[/yellow]",
+                "[yellow]Please check that your SPOTIPY_CLIENT_ID and "
+                "SPOTIPY_CLIENT_SECRET in .env are correct.[/yellow]",
                 title="[bold red]Authentication Failure[/bold red]",
                 border_style="red",
             )
         )
         return None
 
+
 def display_header(user_info=None):
     """Display clean application banner."""
     console.clear()
-    user_str = f"[bold green]Account:[/bold green] {user_info['display_name']} ({user_info['id']})" if user_info else "[yellow]Authenticating...[/yellow]"
-    
-    banner_text = f"""[bold cyan]SPOTIFY PLAYLIST CREATOR[/bold cyan]
-Convert text song lists into official Spotify playlists.
-Folder: [bold magenta]{SOURCE_FOLDER_NAME}/[/bold magenta]
-{user_str}"""
+    if user_info:
+        user_str = (
+            f"[bold green]Account:[/bold green] "
+            f"{user_info['display_name']} ({user_info['id']})"
+        )
+    else:
+        user_str = "[yellow]Authenticating...[/yellow]"
+
+    banner_text = (
+        "[bold cyan]SPOTIFY PLAYLIST CREATOR[/bold cyan]\n"
+        "Convert text song lists into official Spotify playlists.\n"
+        f"Folder: [bold magenta]{SOURCE_FOLDER_NAME}/[/bold magenta]\n"
+        f"{user_str}"
+    )
     console.print(Panel(banner_text, border_style="green", expand=False))
+
 
 def search_track(sp, song_line):
     """
@@ -108,7 +120,7 @@ def search_track(sp, song_line):
     3. Strict verification (verify_track_match) to eliminate false artist/title substitutions.
     """
     queries = generate_search_queries(song_line)
-    
+
     for query_text in queries:
         if " - " in query_text:
             parts = query_text.split(" - ", 1)
@@ -138,12 +150,13 @@ def search_track(sp, song_line):
 
     return None
 
+
 def import_file_to_spotify(sp, user_id, file_info, custom_name=None):
     """Process file and create Spotify playlist."""
     filename = file_info['filename']
     file_path = file_info['path']
     raw_songs = parse_songs(file_path)
-    
+
     if not raw_songs:
         console.print(f"[bold yellow]Notice: '{filename}' contains no songs. Skipping.[/bold yellow]")
         return None
@@ -159,8 +172,12 @@ def import_file_to_spotify(sp, user_id, file_info, custom_name=None):
 
     playlist_name = custom_name or os.path.splitext(filename)[0].replace('_', ' ').title()
 
-    console.print(f"\n[bold green]Creating Playlist:[/bold green] [bold white]{playlist_name}[/bold white] ({len(unique_songs)} unique songs)")
-    
+    console.print(
+        f"\n[bold green]Creating Playlist:[/bold green] "
+        f"[bold white]{playlist_name}[/bold white] "
+        f"({len(unique_songs)} unique songs)"
+    )
+
     track_uris = []
     not_found = []
 
@@ -172,7 +189,7 @@ def import_file_to_spotify(sp, user_id, file_info, custom_name=None):
         console=console
     ) as progress:
         task = progress.add_task("Searching Spotify...", total=len(unique_songs))
-        
+
         for song in unique_songs:
             progress.update(task, description=f"Searching: [bold cyan]{song}[/bold cyan]")
             track = search_track(sp, song)
@@ -198,20 +215,26 @@ def import_file_to_spotify(sp, user_id, file_info, custom_name=None):
     table.add_column("Details", style="bold green")
 
     table.add_row("Total Listed Songs", str(len(unique_songs)))
-    table.add_row("Added to Spotify", f"{len(track_uris)} ({int(len(track_uris)/len(unique_songs)*100)}%)")
+    table.add_row("Added to Spotify", f"{len(track_uris)} ({int(len(track_uris) / len(unique_songs) * 100)}%)")
     table.add_row("Unmatched Songs", str(len(not_found)))
     table.add_row("Playlist Web Link", f"[underline blue]{playlist['external_urls']['spotify']}[/underline blue]")
 
     console.print(table)
 
     if not_found:
-        console.print(Panel(
-            "\n".join([f"- {item}" for item in not_found[:15]]) + (f"\n... and {len(not_found)-15} more" if len(not_found) > 15 else ""),
-            title=f"Unmatched Songs ({len(not_found)})",
-            border_style="yellow"
-        ))
+        extra = ""
+        if len(not_found) > 15:
+            extra = f"\n... and {len(not_found) - 15} more"
+        console.print(
+            Panel(
+                "\n".join([f"- {item}" for item in not_found[:15]]) + extra,
+                title=f"Unmatched Songs ({len(not_found)})",
+                border_style="yellow",
+            )
+        )
 
     return playlist['external_urls']['spotify']
+
 
 def list_files_table(file_info_list):
     """Display table of available playlist text files."""
@@ -226,6 +249,7 @@ def list_files_table(file_info_list):
         table.add_row(str(idx), info['filename'], str(info['song_count']), size_kb)
 
     console.print(table)
+
 
 def interactive_menu(sp, user_info):
     """Run interactive menu loop."""
@@ -284,41 +308,43 @@ def interactive_menu(sp, user_info):
                     link = import_file_to_spotify(sp, user_id, info)
                     if link:
                         created_links.append((info['filename'], link))
-                
+
                 if created_links:
                     console.print("\n[bold green]Batch Playlist Creation Complete![/bold green]")
                     for fname, link in created_links:
                         console.print(f"- [bold white]{fname}[/bold white]: [underline blue]{link}[/underline blue]")
-            
+
             Prompt.ask("\nPress Enter to return")
 
         elif choice == "4":
             display_header(user_info)
-            info_text = f"""[bold yellow]HOW TO USE PLAYLIST CREATOR[/bold yellow]
-
-1. Place any text file (.txt) with song titles into:
-   [bold magenta]{PLAYLIST_SOURCES_DIR}[/bold magenta]
-
-2. Text File Format:
-   Song Title - Artist Name  (or simply Song Title Artist Name)
-
-3. The system will automatically search Spotify, create the playlist on your account,
-   and output the direct link to listen!"""
+            info_text = (
+                "[bold yellow]HOW TO USE PLAYLIST CREATOR[/bold yellow]\n\n"
+                "1. Place any text file (.txt) with song titles into:\n"
+                f"   [bold magenta]{PLAYLIST_SOURCES_DIR}[/bold magenta]\n\n"
+                "2. Text File Format:\n"
+                "   Song Title - Artist Name  "
+                "(or simply Song Title Artist Name)\n\n"
+                "3. The system will automatically search Spotify, "
+                "create the playlist on your account,\n"
+                "   and output the direct link to listen!"
+            )
             console.print(Panel(info_text, border_style="blue"))
             Prompt.ask("\nPress Enter to return")
 
         elif choice == "0":
             break
 
+
 def main():
     ensure_source_folder()
     display_header()
-    
+
     sp = get_spotify_client()
     if not sp:
         Prompt.ask("\nPress Enter to return to Main Menu")
         return
-        
+
     try:
         user_info = sp.current_user()
         interactive_menu(sp, user_info)

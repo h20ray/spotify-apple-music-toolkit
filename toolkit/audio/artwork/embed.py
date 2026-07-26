@@ -83,5 +83,3 @@ def embed_artwork(file_path: str, image_bytes: bytes) -> bool:
     if f_lower.endswith(".flac"):
         return embed_artwork_flac(file_path, image_bytes)
     return False
-
-

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import re
 import time
-from typing import Any, Optional
 
 from toolkit.core import APPLE_MUSIC_DEVELOPER_TOKEN, APPLE_MUSIC_USER_TOKEN, http_get, http_post
 from toolkit.core.constants import (
@@ -39,6 +38,7 @@ def get_apple_developer_token():
 
     return None
 
+
 def create_apple_music_cloud_playlist(playlist_name, tracks, user_token=None):
     """
     Directly create playlist in user's Apple Music Cloud account via official Apple Music API.
@@ -46,7 +46,10 @@ def create_apple_music_cloud_playlist(playlist_name, tracks, user_token=None):
     """
     u_token = user_token or APPLE_MUSIC_USER_TOKEN
     if not u_token:
-        console.print("[bold yellow]Notice: APPLE_MUSIC_USER_TOKEN not set in .env. Skipping direct Cloud Sync.[/bold yellow]")
+        console.print(
+            "[bold yellow]Notice: APPLE_MUSIC_USER_TOKEN not set in .env. Skipping direct Cloud"
+            "Sync.[/bold yellow]"
+        )
         return False
 
     dev_token = get_apple_developer_token()
@@ -104,12 +107,16 @@ def create_apple_music_cloud_playlist(playlist_name, tracks, user_token=None):
                         time.sleep(APPLE_MUSIC_API_RETRY_DELAY * (attempt + 1))
                     else:
                         console.print(
-                            f"[bold yellow]Batch Add Notice ({resp_add.status_code}):[/bold yellow] {resp_add.text[:150]}"
+                            f"[bold yellow]Batch Add Notice "
+                            f"({resp_add.status_code}):[/bold yellow] "
+                            f"{resp_add.text[:150]}"
                         )
                         break
 
             console.print(
-                f"[bold green]✓ SUCCESS! Playlist '{playlist_name}' ({added_count} tracks) synced directly to your Apple Music Account![/bold green]"
+                f"[bold green]✓ SUCCESS! Playlist '{playlist_name}' "
+                f"({added_count} tracks) synced directly to your "
+                f"Apple Music Account![/bold green]"
             )
             return True
         console.print(f"[bold yellow]Apple Music API Notice ({resp.status_code}):[/bold yellow] {resp.text[:200]}")
@@ -118,4 +125,3 @@ def create_apple_music_cloud_playlist(playlist_name, tracks, user_token=None):
         console.print(f"[bold red]API Exception:[/bold red] {e}")
 
     return False
-

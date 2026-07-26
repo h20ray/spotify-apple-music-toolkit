@@ -6,7 +6,6 @@ Provides Rich-integrated logging with consistent formatting across all modules.
 from __future__ import annotations
 
 import logging
-import sys
 from typing import Optional
 
 from rich.console import Console
