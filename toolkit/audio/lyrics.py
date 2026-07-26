@@ -5,65 +5,65 @@ Formats clean standard headers [ti:Title], [ar:Artist], [al:Album].
 Uses shared COMPILATION_KEYWORDS and pre_sanitize_song_line for DRY compliance.
 """
 
-import os
-import sys
+from __future__ import annotations
+
 import datetime
+import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
-
-from toolkit.core import (
-    AUDIO_LIBRARY_DIR,
-    PLAYLIST_SOURCES_DIR,
-    SOURCE_TEXT_FILES_DIR,
-    REPORTS_DIR,
-    EXPORT_LYRICS_DIR,
-    http_get,
-)
-from toolkit.playlists.parser import COMPILATION_KEYWORDS, pre_sanitize_song_line
-
-import mutagen
-from mutagen.mp3 import MP3
-from mutagen.id3 import ID3
-from mutagen.mp4 import MP4
+from typing import Any, Optional
 
 from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 from rich.live import Live
+from rich.panel import Panel
+from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn
 from rich.prompt import Prompt
+from rich.table import Table
+
+from toolkit.audio.metadata import read_local_audio_metadata
+from toolkit.core import (
+    AUDIO_LIBRARY_DIR,
+    EXPORT_LYRICS_DIR,
+    PLAYLIST_SOURCES_DIR,
+    REPORTS_DIR,
+    SOURCE_TEXT_FILES_DIR,
+    http_get,
+)
+from toolkit.core.constants import DEFAULT_MAX_WORKERS, TIMEOUT_API_LONG
+from toolkit.core.logging import get_logger
+from toolkit.playlists.parser import COMPILATION_KEYWORDS, pre_sanitize_song_line
 
 console = Console()
 STATUS_LOCK = Lock()
+logger = get_logger(__name__)
 
 LRCLIB_GET_URL = "https://lrclib.net/api/get"
 LRCLIB_SEARCH_URL = "https://lrclib.net/api/search"
 
-def ensure_folders():
+
+def ensure_folders() -> None:
     """Ensure destination directories exist."""
     for folder in [AUDIO_LIBRARY_DIR, PLAYLIST_SOURCES_DIR, SOURCE_TEXT_FILES_DIR, REPORTS_DIR, EXPORT_LYRICS_DIR]:
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-def filter_best_lrc_item(results):
+
+def filter_best_lrc_item(results: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
     """Prioritizes official studio albums over compilations in lyric search results."""
     if not results:
         return None
-        
-    synced_studio = []
-    synced_others = []
-    plain_studio = []
-    plain_others = []
+
+    synced_studio: list[dict[str, Any]] = []
+    synced_others: list[dict[str, Any]] = []
+    plain_studio: list[dict[str, Any]] = []
+    plain_others: list[dict[str, Any]] = []
 
     for item in results:
         alb_name = item.get("albumName", "").lower()
         art_name = item.get("artistName", "").lower()
         has_synced = bool(item.get("syncedLyrics"))
-        
-        is_compilation = (
-            any(k in alb_name for k in COMPILATION_KEYWORDS) or
-            'various' in art_name
-        )
+
+        is_compilation = any(k in alb_name for k in COMPILATION_KEYWORDS) or "various" in art_name
 
         if has_synced:
             if not is_compilation:
@@ -78,44 +78,14 @@ def filter_best_lrc_item(results):
 
     if synced_studio:
         return synced_studio[0]
-    elif synced_others:
+    if synced_others:
         return synced_others[0]
-    elif plain_studio:
+    if plain_studio:
         return plain_studio[0]
-    elif plain_others:
+    if plain_others:
         return plain_others[0]
     return results[0]
 
-def read_local_audio_metadata(file_path):
-    """Read Title, Artist, Album directly from local MP3 or M4A file tags."""
-    title, artist, album = None, None, None
-    file_lower = file_path.lower()
-    
-    if file_lower.endswith('.mp3'):
-        try:
-            audio = MP3(file_path, ID3=ID3)
-            if audio.tags:
-                if 'TIT2' in audio.tags and audio.tags['TIT2'].text:
-                    title = str(audio.tags['TIT2'].text[0]).strip()
-                if 'TPE1' in audio.tags and audio.tags['TPE1'].text:
-                    artist = str(audio.tags['TPE1'].text[0]).strip()
-                if 'TALB' in audio.tags and audio.tags['TALB'].text:
-                    album = str(audio.tags['TALB'].text[0]).strip()
-        except Exception:
-            pass
-    elif file_lower.endswith('.m4a'):
-        try:
-            audio = MP4(file_path)
-            if '\xa9nam' in audio and audio['\xa9nam']:
-                title = str(audio['\xa9nam'][0]).strip()
-            if '\xa9ART' in audio and audio['\xa9ART']:
-                artist = str(audio['\xa9ART'][0]).strip()
-            if '\xa9alb' in audio and audio['\xa9alb']:
-                album = str(audio['\xa9alb'][0]).strip()
-        except Exception:
-            pass
-
-    return title, artist, album
 
 def format_lrc_with_headers(raw_lyrics, title, artist="", album=""):
     """
@@ -146,13 +116,13 @@ def fetch_synced_lrc(track_name, artist_name="", fallback_album=""):
     if artist_name:
         params = {"track_name": track_name, "artist_name": artist_name}
         try:
-            r = http_get(LRCLIB_GET_URL, params=params, headers=headers, timeout=10)
+            r = http_get(LRCLIB_GET_URL, params=params, headers=headers, timeout=TIMEOUT_API_LONG)
             if r.status_code == 200:
                 data = r.json()
                 t_name = data.get("trackName") or track_name
                 a_name = data.get("artistName") or artist_name
                 alb_name = data.get("albumName") or fallback_album
-                
+
                 alb_lower = alb_name.lower()
                 if any(k in alb_lower for k in COMPILATION_KEYWORDS) and fallback_album:
                     alb_name = fallback_album
@@ -162,23 +132,25 @@ def fetch_synced_lrc(track_name, artist_name="", fallback_album=""):
                     lrc_type = "Synced Lyrics (.lrc)" if data.get("syncedLyrics") else "Plain Lyrics"
                     formatted_lrc = format_lrc_with_headers(raw_lrc, t_name, a_name, alb_name)
                     return formatted_lrc, lrc_type, alb_name
-        except Exception:
-            pass
+        except (OSError, ValueError, KeyError) as e:
+            logger.debug(f"LrcLib get failed for '{track_name}': {e}")
 
     query = f"{track_name} {artist_name}".strip()
     try:
-        r_search = http_get(LRCLIB_SEARCH_URL, params={"q": query}, headers=headers, timeout=10)
+        r_search = http_get(LRCLIB_SEARCH_URL, params={"q": query}, headers=headers, timeout=TIMEOUT_API_LONG)
         if r_search.status_code == 200:
             results = r_search.json()
             if results:
                 target_item = filter_best_lrc_item(results)
+                if not target_item:
+                    return None, "Lyrics Not Found", fallback_album
 
                 raw_lrc = target_item.get("syncedLyrics") or target_item.get("plainLyrics")
                 if raw_lrc:
                     t_name = target_item.get("trackName") or track_name
                     a_name = target_item.get("artistName") or artist_name
                     alb_name = target_item.get("albumName") or fallback_album
-                    
+
                     alb_lower = alb_name.lower()
                     if any(k in alb_lower for k in COMPILATION_KEYWORDS) and fallback_album:
                         alb_name = fallback_album
@@ -186,18 +158,20 @@ def fetch_synced_lrc(track_name, artist_name="", fallback_album=""):
                     lrc_type = "Synced Lyrics (.lrc)" if target_item.get("syncedLyrics") else "Plain Lyrics"
                     formatted_lrc = format_lrc_with_headers(raw_lrc, t_name, a_name, alb_name)
                     return formatted_lrc, lrc_type, alb_name
-    except Exception:
-        pass
+    except (OSError, ValueError, KeyError, TypeError) as e:
+        logger.debug(f"LrcLib search failed for '{query}': {e}")
 
     return None, "Lyrics Not Found", fallback_album
+
 
 def save_lrc_file(output_path, lyrics_content):
     """Save .lrc content to file."""
     try:
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write(lyrics_content)
         return True
-    except Exception as e:
+    except OSError as e:
+        logger.warning(f"Error saving {output_path}: {e}")
         console.print(f"[red]Error saving {output_path}: {e}[/red]")
         return False
 
@@ -248,9 +222,11 @@ def _process_single_lrc_worker(fname, thread_slot, progress, master_task, worker
                 'report': f"{fname} | {source_label} | Lyrics Not Found"
             }
     finally:
-        progress.advance(master_task)
+        with STATUS_LOCK:
+            progress.advance(master_task)
 
-def sync_audio_library_lyrics(max_workers=10):
+
+def sync_audio_library_lyrics(max_workers=DEFAULT_MAX_WORKERS):
     """Multi-threaded download of .lrc files for audio_library folder."""
     ensure_folders()
     audio_files = [f for f in os.listdir(AUDIO_LIBRARY_DIR) if f.lower().endswith(('.mp3', '.m4a', '.flac', '.aac'))]
@@ -331,7 +307,8 @@ def sync_audio_library_lyrics(max_workers=10):
             for r in results:
                 rf.write(f"{r['report']}\n")
         console.print(f"\n[bold green]Report saved to:[/bold green] [underline magenta]reports/lyrics_download_report.txt[/underline magenta]\n")
-    except Exception as e:
+    except OSError as e:
+        logger.warning(f"Could not write report file: {e}")
         console.print(f"[dim yellow]Notice: Could not write report file: {e}[/dim yellow]")
 
 def sync_playlist_text_lyrics():
@@ -472,10 +449,13 @@ def main():
 
         if choice == "1":
             try:
-                workers_input = Prompt.ask("\nSelect worker thread count (e.g. 5 to 20)", default="10")
+                workers_input = Prompt.ask(
+                    "\nSelect worker thread count (e.g. 5 to 20)",
+                    default=str(DEFAULT_MAX_WORKERS),
+                )
                 workers_val = int(workers_input)
-            except Exception:
-                workers_val = 10
+            except (ValueError, TypeError):
+                workers_val = DEFAULT_MAX_WORKERS
             sync_audio_library_lyrics(max_workers=workers_val)
             Prompt.ask("\nPress Enter to return")
         elif choice == "2":

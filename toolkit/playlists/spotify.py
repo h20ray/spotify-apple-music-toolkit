@@ -4,37 +4,42 @@ Converts text song lists into official Spotify playlists via Spotipy API.
 Uses shared pre-sanitization, query generation, and strict candidate track verification.
 """
 
+from __future__ import annotations
+
 import os
-import sys
+from typing import Any, Optional
+
 import spotipy
+from rich.console import Console
+from rich.panel import Panel
+from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn
+from rich.prompt import Confirm, Prompt
+from rich.table import Table
 from spotipy.oauth2 import SpotifyOAuth
 
 from toolkit.core import (
+    CACHE_DIR,
     PLAYLIST_SOURCES_DIR,
     SPOTIPY_CLIENT_ID,
     SPOTIPY_CLIENT_SECRET,
     SPOTIPY_REDIRECT_URI,
-    CACHE_DIR,
-    get_network_session,
     ensure_all_folders,
+    get_network_session,
 )
+from toolkit.core.constants import SPOTIFY_PLAYLIST_BATCH_SIZE
+from toolkit.core.logging import get_logger
 from toolkit.playlists.parser import (
-    parse_songs,
-    scan_playlist_files,
     clean_string,
-    pre_sanitize_song_line,
     generate_search_queries,
+    parse_songs,
+    pre_sanitize_song_line,
+    scan_playlist_files,
     verify_track_match,
 )
 
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
-from rich.prompt import Prompt, Confirm
-
 console = Console()
-SCOPE = 'playlist-modify-public playlist-modify-private'
+logger = get_logger(__name__)
+SCOPE = "playlist-modify-public playlist-modify-private"
 SOURCE_FOLDER_NAME = "playlist_sources"
 
 def ensure_source_folder():
@@ -72,13 +77,16 @@ def get_spotify_client():
             requests_session=session
         )
         return spotipy.Spotify(auth_manager=auth_manager, requests_session=session)
-    except Exception as e:
-        console.print(Panel(
-            f"[bold red]Spotify Authentication Error:[/bold red] {e}\n\n"
-            "[yellow]Please check that your SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET in .env are correct.[/yellow]",
-            title="[bold red]Authentication Failure[/bold red]",
-            border_style="red"
-        ))
+    except (spotipy.SpotifyException, OSError, ValueError) as e:
+        logger.error(f"Spotify authentication failed: {e}")
+        console.print(
+            Panel(
+                f"[bold red]Spotify Authentication Error:[/bold red] {e}\n\n"
+                "[yellow]Please check that your SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET in .env are correct.[/yellow]",
+                title="[bold red]Authentication Failure[/bold red]",
+                border_style="red",
+            )
+        )
         return None
 
 def display_header(user_info=None):
@@ -102,31 +110,31 @@ def search_track(sp, song_line):
     queries = generate_search_queries(song_line)
     
     for query_text in queries:
-        if ' - ' in query_text:
-            parts = query_text.split(' - ', 1)
+        if " - " in query_text:
+            parts = query_text.split(" - ", 1)
             title, artist = parts[0].strip(), parts[1].strip()
             sp_query = f"track:{title} artist:{artist}"
             try:
-                results = sp.search(q=sp_query, limit=5, type='track')
-                items = results.get('tracks', {}).get('items', [])
+                results = sp.search(q=sp_query, limit=5, type="track")
+                items = results.get("tracks", {}).get("items", [])
                 for item in items:
-                    cand_title = item.get('name', '')
-                    cand_artist = item.get('artists', [{}])[0].get('name', '')
+                    cand_title = item.get("name", "")
+                    cand_artist = item.get("artists", [{}])[0].get("name", "")
                     if verify_track_match(song_line, cand_title, cand_artist):
                         return item
-            except Exception:
-                pass
-        
+            except spotipy.SpotifyException as e:
+                logger.debug(f"Spotify fielded search failed: {e}")
+
         try:
-            results = sp.search(q=query_text, limit=5, type='track')
-            items = results.get('tracks', {}).get('items', [])
+            results = sp.search(q=query_text, limit=5, type="track")
+            items = results.get("tracks", {}).get("items", [])
             for item in items:
-                cand_title = item.get('name', '')
-                cand_artist = item.get('artists', [{}])[0].get('name', '')
+                cand_title = item.get("name", "")
+                cand_artist = item.get("artists", [{}])[0].get("name", "")
                 if verify_track_match(song_line, cand_title, cand_artist):
                     return item
-        except Exception:
-            pass
+        except spotipy.SpotifyException as e:
+            logger.debug(f"Spotify free-text search failed: {e}")
 
     return None
 
@@ -181,8 +189,8 @@ def import_file_to_spotify(sp, user_id, file_info, custom_name=None):
     playlist = sp.user_playlist_create(user=user_id, name=playlist_name, public=True)
     playlist_id = playlist['id']
 
-    for i in range(0, len(track_uris), 100):
-        batch = track_uris[i:i+100]
+    for i in range(0, len(track_uris), SPOTIFY_PLAYLIST_BATCH_SIZE):
+        batch = track_uris[i : i + SPOTIFY_PLAYLIST_BATCH_SIZE]
         sp.playlist_add_items(playlist_id, batch)
 
     table = Table(title=f"Summary: {playlist_name}", border_style="cyan")
@@ -317,11 +325,13 @@ def main():
     except (KeyboardInterrupt, EOFError):
         console.print("\n[bold yellow]Returning to Main Menu...[/bold yellow]")
         return
-    except Exception as e:
+    except (spotipy.SpotifyException, OSError, ValueError) as e:
+        logger.error(f"Spotify session error: {e}")
         console.print(f"\n[bold red]Authentication Notice:[/bold red] {e}")
         console.print("[dim]Check your .env settings and ensure you clicked 'Save' in the Spotify Dashboard.[/dim]")
         Prompt.ask("\nPress Enter to return to Main Menu")
         return
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

@@ -5,15 +5,20 @@ generate search queries, and strictly verify artist/title candidate matches.
 Dynamically loads keyword filters from user-editable config/keywords.json.
 """
 
+from __future__ import annotations
+
 import os
 import re
 import unicodedata
+from typing import Optional
+
 from toolkit.core import (
     PLAYLIST_SOURCES_DIR,
     SOURCE_TEXT_FILES_DIR,
     ensure_all_folders,
     load_keywords_config,
 )
+from toolkit.core.constants import WORD_MATCH_THRESHOLD
 
 # Dynamically load keyword sets from config/keywords.json
 _KW_CONFIG = load_keywords_config()
@@ -127,7 +132,7 @@ def verify_title_match(target_title, candidate_title):
     if len(t_words) <= 2:
         return matched_count == len(t_words)
     else:
-        return ratio >= 0.65
+        return ratio >= WORD_MATCH_THRESHOLD
 
 def verify_artist_match(target_artist, candidate_artist):
     """

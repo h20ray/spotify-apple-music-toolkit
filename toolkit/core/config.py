@@ -3,17 +3,25 @@ Core Configuration Module.
 Centralizes paths, directory initialization, environment settings, and JSON keywords config loading.
 """
 
+from __future__ import annotations
+
+import json
 import os
 import sys
-import json
+from typing import Any, Optional
+
 from dotenv import load_dotenv
 
+from toolkit.core.logging import get_logger
+
+logger = get_logger(__name__)
+
 # Force UTF-8 stdout encoding on Windows
-if sys.platform == 'win32':
+if sys.platform == "win32":
     try:
-        sys.stdout.reconfigure(encoding='utf-8')
-    except Exception:
-        pass
+        sys.stdout.reconfigure(encoding="utf-8")
+    except (AttributeError, OSError) as e:
+        logger.debug(f"UTF-8 reconfigure skipped: {e}")
 
 load_dotenv()
 
@@ -33,47 +41,48 @@ EXPORT_APPLE_MUSIC_DIR = os.path.join(PLAYLIST_EXPORTS_DIR, "apple_music")
 EXPORT_SPOTIFY_DIR = os.path.join(PLAYLIST_EXPORTS_DIR, "spotify")
 EXPORT_LYRICS_DIR = os.path.join(PLAYLIST_EXPORTS_DIR, "lyrics")
 
-SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
-SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
-SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI', 'https://127.0.0.1:8888/callback')
-APPLE_MUSIC_USER_TOKEN = os.getenv('APPLE_MUSIC_USER_TOKEN')
-APPLE_MUSIC_DEVELOPER_TOKEN = os.getenv('APPLE_MUSIC_DEVELOPER_TOKEN')
+SPOTIPY_CLIENT_ID: Optional[str] = os.getenv("SPOTIPY_CLIENT_ID")
+SPOTIPY_CLIENT_SECRET: Optional[str] = os.getenv("SPOTIPY_CLIENT_SECRET")
+SPOTIPY_REDIRECT_URI: str = os.getenv("SPOTIPY_REDIRECT_URI", "https://127.0.0.1:8888/callback")
+APPLE_MUSIC_USER_TOKEN: Optional[str] = os.getenv("APPLE_MUSIC_USER_TOKEN")
+APPLE_MUSIC_DEVELOPER_TOKEN: Optional[str] = os.getenv("APPLE_MUSIC_DEVELOPER_TOKEN")
 
-DEFAULT_KEYWORDS = {
+DEFAULT_KEYWORDS: dict[str, list[str]] = {
     "compilations": [
         "various artists", "compilation", "greatest hits", "best of", "top 100", "top 50",
-        "essential", "dj mix", "now that's what i call", "summer hits", "soundtrack", "essential classics"
+        "essential", "dj mix", "now that's what i call", "summer hits", "soundtrack", "essential classics",
     ],
     "karaoke_and_tributes": [
         "karaoke", "tribute", "originally performed by", "in the style of", "cover version",
         "backing track", "tribute band", "sing-along", "instrumental version", "piano version",
         "tribute to", "originally by", "as made famous by", "sound-alike", "tribute artist",
-        "instrumental", "cover", "guitar cover", "piano cover", "orchestral cover", "guitar tribute"
+        "instrumental", "cover", "guitar cover", "piano cover", "orchestral cover", "guitar tribute",
     ],
     "unwanted_versions": [
         "live", "acoustic", "instrumental", "tribute", "salute", "cover", "lullaby", "karaoke",
-        "cast recording", "broadway"
+        "cast recording", "broadway",
     ],
     "unwanted_edits": [
         "remix", "edit", "mix", "dub", "refix", "flip", "rework", "re-work", "bootleg", "vip",
-        "radio edit", "club mix", "extended", "slowed", "reverbed", "sped up", "tiktok version"
-    ]
+        "radio edit", "club mix", "extended", "slowed", "reverbed", "sped up", "tiktok version",
+    ],
 }
 
-def ensure_all_folders():
+
+def ensure_all_folders() -> None:
     """Ensure all required project directories exist."""
     if os.path.exists(CACHE_DIR) and os.path.isfile(CACHE_DIR):
         try:
             token_data = None
-            with open(CACHE_DIR, 'r', encoding='utf-8') as f:
+            with open(CACHE_DIR, "r", encoding="utf-8") as f:
                 token_data = f.read()
             os.remove(CACHE_DIR)
             os.makedirs(CACHE_DIR, exist_ok=True)
             if token_data:
-                with open(os.path.join(CACHE_DIR, "spotify_token.json"), 'w', encoding='utf-8') as f:
+                with open(os.path.join(CACHE_DIR, "spotify_token.json"), "w", encoding="utf-8") as f:
                     f.write(token_data)
-        except Exception:
-            pass
+        except OSError as e:
+            logger.warning(f"Failed migrating legacy cache file: {e}")
 
     folders = [
         CONFIG_DIR,
@@ -91,7 +100,8 @@ def ensure_all_folders():
         if not os.path.exists(folder):
             os.makedirs(folder, exist_ok=True)
 
-def load_keywords_config():
+
+def load_keywords_config() -> dict[str, list[str]]:
     """
     Load keywords dictionary from config/keywords.json.
     Auto-creates default template if missing.
@@ -100,45 +110,46 @@ def load_keywords_config():
 
     if not os.path.exists(KEYWORDS_FILE):
         try:
-            with open(KEYWORDS_FILE, 'w', encoding='utf-8') as f:
+            with open(KEYWORDS_FILE, "w", encoding="utf-8") as f:
                 json.dump(DEFAULT_KEYWORDS, f, ensure_ascii=False, indent=2)
-        except Exception:
+        except OSError as e:
+            logger.warning(f"Could not write keywords.json: {e}")
             return DEFAULT_KEYWORDS
 
     try:
-        with open(KEYWORDS_FILE, 'r', encoding='utf-8') as f:
+        with open(KEYWORDS_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        merged = {}
+        merged: dict[str, list[str]] = {}
         for key, default_val in DEFAULT_KEYWORDS.items():
             merged[key] = data.get(key, default_val)
         return merged
-    except Exception:
+    except (OSError, json.JSONDecodeError, TypeError) as e:
+        logger.warning(f"Failed loading keywords.json, using defaults: {e}")
         return DEFAULT_KEYWORDS
 
-def get_all_txt_files():
+
+def get_all_txt_files() -> list[dict[str, str]]:
     """
     Get all input song list text files.
-    Prioritizes files in playlist_sources/source_text_files/, with fallback to playlist_sources/.
-    Ignores generated execution reports (*_report.txt).
+    Prioritizes playlist_sources/source_text_files/, fallback playlist_sources/.
+    Ignores generated reports (*_report.txt).
     """
-    txt_files = []
-    seen_names = set()
+    txt_files: list[dict[str, str]] = []
+    seen_names: set[str] = set()
 
-    # Priority 1: playlist_sources/source_text_files/
     if os.path.exists(SOURCE_TEXT_FILES_DIR):
         for f in sorted(os.listdir(SOURCE_TEXT_FILES_DIR)):
-            if f.lower().endswith('.txt') and not f.lower().endswith('_report.txt'):
+            if f.lower().endswith(".txt") and not f.lower().endswith("_report.txt"):
                 fpath = os.path.join(SOURCE_TEXT_FILES_DIR, f)
-                txt_files.append({'name': f, 'path': fpath, 'rel': 'playlist_sources/source_text_files/'})
+                txt_files.append({"name": f, "path": fpath, "rel": "playlist_sources/source_text_files/"})
                 seen_names.add(f)
 
-    # Priority 2: playlist_sources/ fallback
     if os.path.exists(PLAYLIST_SOURCES_DIR):
         for f in sorted(os.listdir(PLAYLIST_SOURCES_DIR)):
-            if f.lower().endswith('.txt') and not f.lower().endswith('_report.txt') and f not in seen_names:
+            if f.lower().endswith(".txt") and not f.lower().endswith("_report.txt") and f not in seen_names:
                 fpath = os.path.join(PLAYLIST_SOURCES_DIR, f)
                 if os.path.isfile(fpath):
-                    txt_files.append({'name': f, 'path': fpath, 'rel': 'playlist_sources/'})
+                    txt_files.append({"name": f, "path": fpath, "rel": "playlist_sources/"})
 
     return txt_files

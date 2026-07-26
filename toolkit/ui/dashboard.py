@@ -2,39 +2,51 @@
 Master UI Dashboard & Interactive Menu.
 """
 
+from __future__ import annotations
+
 import os
 import sys
+from typing import Any, Optional
+
 import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
 from rich.console import Console
 from rich.panel import Panel
-from rich.table import Table
 from rich.prompt import Prompt
+from rich.table import Table
+from spotipy.oauth2 import SpotifyClientCredentials
 
+from toolkit.audio import sync_audio_library_lyrics, tag_audio_folder
 from toolkit.core import (
     AUDIO_LIBRARY_DIR,
     SPOTIPY_CLIENT_ID,
     SPOTIPY_CLIENT_SECRET,
-    get_network_session,
     ensure_all_folders,
     get_all_txt_files,
+    get_network_session,
 )
-from toolkit.audio import tag_audio_folder, fix_album_art, sync_audio_library_lyrics, sync_playlist_text_lyrics
-from toolkit.playlists import run_spotify_playlist_creator, run_apple_music_playlist_creator
+from toolkit.core.logging import get_logger, setup_logging
+from toolkit.playlists import run_apple_music_playlist_creator, run_spotify_playlist_creator
 
 console = Console()
+logger = get_logger(__name__)
 
-def check_spotify_connection():
+
+def check_spotify_connection() -> tuple[Optional[Any], str]:
     """Check Spotify API connection status seamlessly without blocking."""
     if not SPOTIPY_CLIENT_ID or not SPOTIPY_CLIENT_SECRET:
         return None, "[bold red]Offline (Missing .env API Keys)[/bold red]"
     try:
         session = get_network_session()
-        auth_mgr = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET, requests_session=session)
+        auth_mgr = SpotifyClientCredentials(
+            client_id=SPOTIPY_CLIENT_ID,
+            client_secret=SPOTIPY_CLIENT_SECRET,
+            requests_session=session,
+        )
         sp = spotipy.Spotify(client_credentials_manager=auth_mgr, requests_session=session)
         sp.search(q="test", limit=1, type="track")
         return sp, "[bold green]API Connection Active (Ready)[/bold green]"
-    except Exception:
+    except (spotipy.SpotifyException, OSError, ValueError) as e:
+        logger.debug(f"Spotify connection check failed: {e}")
         return None, "[bold yellow]Offline (Invalid API Credentials)[/bold yellow]"
 
 def display_dashboard():
@@ -116,7 +128,8 @@ def scan_workspace_overview():
 
     console.print(t2)
 
-def main():
+def main() -> None:
+    setup_logging()
     ensure_all_folders()
 
     while True:

@@ -3,114 +3,90 @@ Audio Tagger Module.
 Handles audio metadata tagging (ID3/MP4), physical tempo (BPM) calculation, and music mood derivation.
 """
 
+from __future__ import annotations
+
+import datetime
+import json
 import os
-import sys
-import logging
 import warnings
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
-import datetime
+from typing import Any, Optional
 
+import spotipy
+from mutagen import MutagenError
+from mutagen.id3 import APIC, COMM, ID3, ID3NoHeaderError, TALB, TBPM, TCON, TIT2, TMOO, TPE1
+from mutagen.mp3 import MP3
+from mutagen.mp4 import MP4, MP4Cover
+from rich.console import Console
+from rich.live import Live
+from rich.panel import Panel
+from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn
+from rich.prompt import Prompt
+from rich.table import Table
+from spotipy.oauth2 import SpotifyClientCredentials
+
+from toolkit.audio.metadata import read_all_existing_metadata
 from toolkit.core import (
     AUDIO_LIBRARY_DIR,
+    CACHE_DIR,
     REPORTS_DIR,
     SPOTIPY_CLIENT_ID,
     SPOTIPY_CLIENT_SECRET,
     http_get,
 )
+from toolkit.core.constants import (
+    DEFAULT_MAX_WORKERS,
+    LIBROSA_DURATION_SECONDS,
+    TIMEOUT_API_LONG,
+)
+from toolkit.core.logging import get_logger
 from toolkit.playlists.parser import COMPILATION_KEYWORDS, pre_sanitize_song_line
 
-# Suppress internal warnings and HTTP logs
 warnings.filterwarnings("ignore")
-logging.getLogger('spotipy').setLevel(logging.CRITICAL)
-
-import mutagen
-from mutagen.mp3 import MP3
-from mutagen.id3 import ID3, TIT2, TPE1, TALB, TCON, TBPM, TMOO, COMM, APIC, ID3NoHeaderError
-from mutagen.mp4 import MP4, MP4Cover
-
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
-from rich.live import Live
-from rich.prompt import Prompt
 
 console = Console()
 STATUS_LOCK = Lock()
+logger = get_logger(__name__)
 
-def get_spotify_client():
+SPOTIFY_TAG_CACHE_FILE = os.path.join(CACHE_DIR, "spotify_tag_cache.json")
+_SPOTIFY_TAG_CACHE: dict[str, Any] = {}
+_SPOTIFY_TAG_CACHE_LOADED = False
+
+
+def _load_spotify_tag_cache() -> None:
+    global _SPOTIFY_TAG_CACHE, _SPOTIFY_TAG_CACHE_LOADED
+    if _SPOTIFY_TAG_CACHE_LOADED:
+        return
+    _SPOTIFY_TAG_CACHE_LOADED = True
+    if os.path.exists(SPOTIFY_TAG_CACHE_FILE):
+        try:
+            with open(SPOTIFY_TAG_CACHE_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                _SPOTIFY_TAG_CACHE = data
+        except (OSError, json.JSONDecodeError) as e:
+            logger.warning(f"Failed loading Spotify tag cache: {e}")
+            _SPOTIFY_TAG_CACHE = {}
+
+
+def _save_spotify_tag_cache() -> None:
+    try:
+        os.makedirs(CACHE_DIR, exist_ok=True)
+        with open(SPOTIFY_TAG_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(_SPOTIFY_TAG_CACHE, f, ensure_ascii=False, indent=2)
+    except OSError as e:
+        logger.warning(f"Failed saving Spotify tag cache: {e}")
+
+
+def get_spotify_client() -> spotipy.Spotify:
     """Authenticate with Spotify via API credentials."""
     if not SPOTIPY_CLIENT_ID or not SPOTIPY_CLIENT_SECRET:
-        console.print("Error: Missing SPOTIPY_CLIENT_ID or SPOTIPY_CLIENT_SECRET in .env configuration file.")
-        sys.exit(0)
-    
+        raise RuntimeError("Missing SPOTIPY_CLIENT_ID or SPOTIPY_CLIENT_SECRET in .env configuration file.")
+
     auth_mgr = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
     return spotipy.Spotify(client_credentials_manager=auth_mgr)
 
-def read_all_existing_metadata(file_path):
-    """Read existing audio tags from local MP3 or M4A file."""
-    f_lower = file_path.lower()
-    meta = {
-        'title': None,
-        'artist': None,
-        'album': None,
-        'genre': None,
-        'year': None,
-        'bpm': 0,
-        'has_cover': False
-    }
-
-    if f_lower.endswith('.mp3'):
-        try:
-            audio = MP3(file_path, ID3=ID3)
-            if audio.tags:
-                if 'TIT2' in audio.tags and audio.tags['TIT2'].text:
-                    meta['title'] = str(audio.tags['TIT2'].text[0]).strip()
-                if 'TPE1' in audio.tags and audio.tags['TPE1'].text:
-                    meta['artist'] = str(audio.tags['TPE1'].text[0]).strip()
-                if 'TALB' in audio.tags and audio.tags['TALB'].text:
-                    meta['album'] = str(audio.tags['TALB'].text[0]).strip()
-                if 'TCON' in audio.tags and audio.tags['TCON'].text:
-                    meta['genre'] = str(audio.tags['TCON'].text[0]).strip()
-                if 'TDRC' in audio.tags and audio.tags['TDRC'].text:
-                    meta['year'] = str(audio.tags['TDRC'].text[0]).strip()[:4]
-                elif 'TYER' in audio.tags and audio.tags['TYER'].text:
-                    meta['year'] = str(audio.tags['TYER'].text[0]).strip()[:4]
-                if 'TBPM' in audio.tags and audio.tags['TBPM'].text:
-                    try:
-                        meta['bpm'] = int(round(float(str(audio.tags['TBPM'].text[0]).strip())))
-                    except Exception:
-                        pass
-                meta['has_cover'] = any(k.startswith('APIC') for k in audio.tags.keys())
-        except Exception:
-            pass
-
-    elif f_lower.endswith('.m4a'):
-        try:
-            audio = MP4(file_path)
-            if '\xa9nam' in audio and audio['\xa9nam']:
-                meta['title'] = str(audio['\xa9nam'][0]).strip()
-            if '\xa9ART' in audio and audio['\xa9ART']:
-                meta['artist'] = str(audio['\xa9ART'][0]).strip()
-            if '\xa9alb' in audio and audio['\xa9alb']:
-                meta['album'] = str(audio['\xa9alb'][0]).strip()
-            if '\xa9gen' in audio and audio['\xa9gen']:
-                meta['genre'] = str(audio['\xa9gen'][0]).strip()
-            if '\xa9day' in audio and audio['\xa9day']:
-                meta['year'] = str(audio['\xa9day'][0]).strip()[:4]
-            if 'tmpo' in audio and audio['tmpo']:
-                try:
-                    meta['bpm'] = int(audio['tmpo'][0])
-                except Exception:
-                    pass
-            meta['has_cover'] = ('covr' in audio and bool(audio['covr']))
-        except Exception:
-            pass
-
-    return meta
 
 def select_best_original_track(items):
     """Prioritizes official Studio Albums over Compilations and Various Artists collections."""
@@ -153,82 +129,109 @@ def select_best_original_track(items):
         return others[0]
     return items[0]
 
-def detect_physical_bpm(file_path):
+def detect_physical_bpm(file_path: str) -> int:
     """Calculate exact physical song tempo (BPM) from audio signal."""
     try:
         import librosa
-        y, sr = librosa.load(file_path, duration=30)
+
+        y, sr = librosa.load(file_path, duration=LIBROSA_DURATION_SECONDS)
         tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
-        bpm_val = int(round(float(tempo[0] if hasattr(tempo, '__len__') else tempo)))
-        return bpm_val
-    except Exception:
+        return int(round(float(tempo[0] if hasattr(tempo, "__len__") else tempo)))
+    except Exception as e:
+        logger.warning(f"BPM detection failed for {file_path}: {e}")
         return 0
 
-def calculate_mood(primary_genre="Pop"):
+
+def calculate_mood(primary_genre: str = "Pop") -> str:
     """Derive clean text music mood style from genre."""
     genre_lower = primary_genre.lower()
-    if any(k in genre_lower for k in ['dance', 'edm', 'house', 'rock', 'metal']):
+    if any(k in genre_lower for k in ["dance", "edm", "house", "rock", "metal"]):
         return "Energetic"
-    elif any(k in genre_lower for k in ['indie', 'folk', 'acoustic', 'bedroom', 'chill']):
+    if any(k in genre_lower for k in ["indie", "folk", "acoustic", "bedroom", "chill"]):
         return "Chill & Melancholic"
-    elif any(k in genre_lower for k in ['r&b', 'soul', 'jazz', 'lo-fi', 'soft']):
+    if any(k in genre_lower for k in ["r&b", "soul", "jazz", "lo-fi", "soft"]):
         return "Smooth & Chill"
-    else:
-        return f"{primary_genre} Style"
+    return f"{primary_genre} Style"
 
-def search_spotify_metadata(sp, query_text):
-    """Fetch track details from Spotify API."""
+
+def search_spotify_metadata(sp: spotipy.Spotify, query_text: str) -> Optional[dict[str, Any]]:
+    """Fetch track details from Spotify API (with local cache)."""
+    _load_spotify_tag_cache()
+    cache_key = query_text.strip().lower()
+    if cache_key in _SPOTIFY_TAG_CACHE:
+        cached = dict(_SPOTIFY_TAG_CACHE[cache_key])
+        cached["cover_data"] = None
+        return cached
+
     try:
-        res = sp.search(q=query_text, limit=5, type='track')
-        items = res.get('tracks', {}).get('items', [])
+        res = sp.search(q=query_text, limit=5, type="track")
+        items = res.get("tracks", {}).get("items", [])
         if not items:
             return None
 
         track = select_best_original_track(items)
         if not track:
             return None
-        
+
         primary_genre = "Pop"
-        artist_id = track['artists'][0]['id']
+        artist_id = track["artists"][0]["id"]
         try:
             artist_info = sp.artist(artist_id)
-            genres = artist_info.get('genres', [])
+            genres = artist_info.get("genres", [])
             if genres:
                 primary_genre = genres[0].title()
-        except Exception:
-            pass
+        except spotipy.SpotifyException as e:
+            logger.debug(f"Artist genre lookup failed: {e}")
 
         mood = calculate_mood(primary_genre)
 
         cover_data = None
-        images = track.get('album', {}).get('images', [])
+        images = track.get("album", {}).get("images", [])
         if images:
-            img_url = images[0]['url']
+            img_url = images[0]["url"]
             try:
-                img_res = http_get(img_url, timeout=10)
+                img_res = http_get(img_url, timeout=TIMEOUT_API_LONG)
                 if img_res.status_code == 200:
                     cover_data = img_res.content
-            except Exception:
-                pass
+            except OSError as e:
+                logger.debug(f"Cover download failed: {e}")
+            except Exception as e:
+                logger.debug(f"Cover download failed: {e}")
 
         year = ""
-        release_date = track.get('album', {}).get('release_date', '')
+        release_date = track.get("album", {}).get("release_date", "")
         if release_date:
-            year = release_date.split('-')[0]
+            year = release_date.split("-")[0]
 
-        return {
-            'title': track['name'],
-            'artist': ", ".join([a['name'] for a in track['artists']]),
-            'album': track['album']['name'],
-            'genre': primary_genre,
-            'year': year,
-            'mood': mood,
-            'cover_data': cover_data
+        result = {
+            "title": track["name"],
+            "artist": ", ".join([a["name"] for a in track["artists"]]),
+            "album": track["album"]["name"],
+            "genre": primary_genre,
+            "year": year,
+            "mood": mood,
+            "cover_data": cover_data,
         }
-    except Exception:
+        # Cache serializable fields only
+        _SPOTIFY_TAG_CACHE[cache_key] = {
+            "title": result["title"],
+            "artist": result["artist"],
+            "album": result["album"],
+            "genre": result["genre"],
+            "year": result["year"],
+            "mood": result["mood"],
+        }
+        _save_spotify_tag_cache()
+        return result
+    except spotipy.SpotifyException as e:
+        logger.warning(f"Spotify search failed for '{query_text}': {e}")
+        return None
+    except Exception as e:
+        logger.warning(f"Unexpected Spotify metadata error for '{query_text}': {e}")
         return None
 
-def tag_mp3_file(file_path, final_meta, write_cover=True):
+
+def tag_mp3_file(file_path: str, final_meta: dict[str, Any], write_cover: bool = True) -> bool:
     """Save audio tags to MP3 file."""
     try:
         try:
@@ -241,56 +244,60 @@ def tag_mp3_file(file_path, final_meta, write_cover=True):
             audio.add_tags()
 
         tags = audio.tags
-        tags.add(TIT2(encoding=3, text=final_meta['title']))
-        tags.add(TPE1(encoding=3, text=final_meta['artist']))
-        tags.add(TALB(encoding=3, text=final_meta['album']))
-        tags.add(TCON(encoding=3, text=final_meta['genre']))
-        
-        if final_meta['bpm'] > 0:
-            tags.add(TBPM(encoding=3, text=str(final_meta['bpm'])))
+        tags.add(TIT2(encoding=3, text=final_meta["title"]))
+        tags.add(TPE1(encoding=3, text=final_meta["artist"]))
+        tags.add(TALB(encoding=3, text=final_meta["album"]))
+        tags.add(TCON(encoding=3, text=final_meta["genre"]))
 
-        tags.add(TMOO(encoding=1, text=final_meta['mood']))
-        tags.add(COMM(encoding=1, lang='eng', desc='', text=f"Mood: {final_meta['mood']}"))
+        if final_meta["bpm"] > 0:
+            tags.add(TBPM(encoding=3, text=str(final_meta["bpm"])))
 
-        if write_cover and final_meta['cover_data']:
-            tags.add(APIC(
-                encoding=0,
-                mime='image/jpeg',
-                type=3,
-                desc='Cover',
-                data=final_meta['cover_data']
-            ))
+        tags.add(TMOO(encoding=1, text=final_meta["mood"]))
+        tags.add(COMM(encoding=1, lang="eng", desc="", text=f"Mood: {final_meta['mood']}"))
 
-        # Save as ID3v2.3 for Windows File Explorer compatibility
+        if write_cover and final_meta["cover_data"]:
+            tags.add(
+                APIC(
+                    encoding=0,
+                    mime="image/jpeg",
+                    type=3,
+                    desc="Cover",
+                    data=final_meta["cover_data"],
+                )
+            )
+
         audio.save(v2_version=3)
         return True
-    except Exception:
+    except (MutagenError, OSError) as e:
+        logger.warning(f"Failed tagging MP3 {file_path}: {e}")
         return False
 
-def tag_m4a_file(file_path, final_meta, write_cover=True):
+
+def tag_m4a_file(file_path: str, final_meta: dict[str, Any], write_cover: bool = True) -> bool:
     """Save audio tags to M4A file."""
     try:
         audio = MP4(file_path)
-        audio['\xa9nam'] = final_meta['title']
-        audio['\xa9ART'] = final_meta['artist']
-        audio['\xa9alb'] = final_meta['album']
-        audio['\xa9gen'] = final_meta['genre']
-        
-        if final_meta['year']:
-            audio['\xa9day'] = final_meta['year']
+        audio["\xa9nam"] = final_meta["title"]
+        audio["\xa9ART"] = final_meta["artist"]
+        audio["\xa9alb"] = final_meta["album"]
+        audio["\xa9gen"] = final_meta["genre"]
 
-        if final_meta['bpm'] > 0:
-            audio['tmpo'] = [final_meta['bpm']]
+        if final_meta["year"]:
+            audio["\xa9day"] = final_meta["year"]
 
-        audio['----:com.apple.iTunes:MOOD'] = final_meta['mood'].encode('utf-8')
-        audio['\xa9cmt'] = [f"Mood: {final_meta['mood']}"]
+        if final_meta["bpm"] > 0:
+            audio["tmpo"] = [final_meta["bpm"]]
 
-        if write_cover and final_meta['cover_data']:
-            audio['covr'] = [MP4Cover(final_meta['cover_data'], imageformat=MP4Cover.FORMAT_JPEG)]
+        audio["----:com.apple.iTunes:MOOD"] = final_meta["mood"].encode("utf-8")
+        audio["\xa9cmt"] = [f"Mood: {final_meta['mood']}"]
+
+        if write_cover and final_meta["cover_data"]:
+            audio["covr"] = [MP4Cover(final_meta["cover_data"], imageformat=MP4Cover.FORMAT_JPEG)]
 
         audio.save()
         return True
-    except Exception:
+    except (MutagenError, OSError, KeyError, TypeError) as e:
+        logger.warning(f"Failed tagging M4A {file_path}: {e}")
         return False
 
 def select_tagging_mode():
@@ -377,9 +384,11 @@ def _process_single_tagger_worker(fname, folder_path, mode, sp, thread_slot, pro
             'report': f"{fname} | {final_title} - {final_artist} | {final_album} | {final_genre} | {final_mood} | {bpm_val} BPM | {action_desc}" if success else f"{fname} | FAILED"
         }
     finally:
-        progress.advance(master_task)
+        with STATUS_LOCK:
+            progress.advance(master_task)
 
-def process_audio_folder(folder_path=AUDIO_LIBRARY_DIR, mode=None, max_workers=10):
+
+def process_audio_folder(folder_path=AUDIO_LIBRARY_DIR, mode=None, max_workers=DEFAULT_MAX_WORKERS):
     """Multi-threaded scan of audio_library folder to calculate BPM and update audio metadata tags."""
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
@@ -398,10 +407,17 @@ def process_audio_folder(folder_path=AUDIO_LIBRARY_DIR, mode=None, max_workers=1
         ))
         return
 
-    sp = get_spotify_client()
+    try:
+        sp = get_spotify_client()
+    except RuntimeError as e:
+        console.print(f"[bold red]Error: {e}[/bold red]")
+        logger.error(str(e))
+        return
 
-    console.print(f"\n[bold green]Found {len(audio_files)} audio file(s) | Multi-Threaded Engine ({max_workers} threads)...[/bold green]")
-    
+    console.print(
+        f"\n[bold green]Found {len(audio_files)} audio file(s) | Multi-Threaded Engine ({max_workers} threads)...[/bold green]"
+    )
+
     if not mode:
         mode = select_tagging_mode()
 
@@ -471,24 +487,32 @@ def process_audio_folder(folder_path=AUDIO_LIBRARY_DIR, mode=None, max_workers=1
                 rf.write(f"{r['report']}\n")
         
         console.print(f"[bold green]Full report saved to:[/bold green] [underline magenta]reports/audio_tagging_report.txt[/underline magenta]\n")
-    except Exception as e:
+    except OSError as e:
+        logger.warning(f"Could not write report file: {e}")
         console.print(f"[dim yellow]Notice: Could not write report file: {e}[/dim yellow]")
 
-def main():
+
+def main() -> None:
     console.clear()
-    console.print(Panel(
-        "[bold cyan]SMART MULTI-THREADED AUDIO TAGGER[/bold cyan]\n"
-        "[bold green]Updates song tags, calculates song tempo (BPM), and embeds artwork via Multi-Threading.[/bold green]",
-        border_style="green"
-    ))
-    
+    console.print(
+        Panel(
+            "[bold cyan]SMART MULTI-THREADED AUDIO TAGGER[/bold cyan]\n"
+            "[bold green]Updates song tags, calculates song tempo (BPM), and embeds artwork via Multi-Threading.[/bold green]",
+            border_style="green",
+        )
+    )
+
     try:
-        workers_input = Prompt.ask("\nSelect worker thread count (e.g. 5 to 20)", default="10")
+        workers_input = Prompt.ask(
+            "\nSelect worker thread count (e.g. 5 to 20)",
+            default=str(DEFAULT_MAX_WORKERS),
+        )
         workers_val = int(workers_input)
-    except Exception:
-        workers_val = 10
+    except (ValueError, TypeError):
+        workers_val = DEFAULT_MAX_WORKERS
 
     process_audio_folder(AUDIO_LIBRARY_DIR, max_workers=workers_val)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

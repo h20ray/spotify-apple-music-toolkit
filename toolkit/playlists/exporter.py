@@ -3,7 +3,12 @@ Playlist Exporter Module.
 Handles writing playlist files in various formats: TSV, M3U8, XML.
 """
 
-def export_apple_tsv(playlist_name, tracks, output_path):
+from __future__ import annotations
+
+from typing import Any
+
+
+def export_apple_tsv(playlist_name: str, tracks: list[dict[str, Any]], output_path: str) -> None:
     """Export official Apple Music native TSV Text Playlist format (.txt)."""
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write("Name\tArtist\tComposer\tAlbum\tGenre\tSize\tTime\tDisc Number\tDisc Count\tTrack Number\tTrack Count\tYear\tDate Modified\tDate Added\tBit Rate\tSample Rate\tVolume Adjustment\tKind\tEqualizer\tComments\tPlay Count\tLast Played\tSkip Count\tLast Skipped\tMy Rating\tLocation\n")
@@ -16,7 +21,7 @@ def export_apple_tsv(playlist_name, tracks, output_path):
 
             f.write(f"{title}\t{artist}\t\t{album}\t\t\t{duration_sec}\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n")
 
-def export_m3u8(playlist_name, tracks, output_path):
+def export_m3u8(playlist_name: str, tracks: list[dict[str, Any]], output_path: str) -> None:
     """Export Apple Music / Spotify compatible UTF-8 M3U playlist file."""
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write("#EXTM3U\n")
@@ -29,7 +34,7 @@ def export_m3u8(playlist_name, tracks, output_path):
 
             f.write(f"#EXTINF:{duration_sec},{artist} - {title}\n\n")
 
-def export_apple_xml(playlist_name, tracks, output_path):
+def export_apple_xml(playlist_name: str, tracks: list[dict[str, Any]], output_path: str) -> None:
     """Export iTunes / Apple Music Library XML playlist file."""
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n')

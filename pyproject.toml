@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spotify-audio-toolkit"
+version = "1.0.0"
+description = "Spotify and Apple Music audio tagging, lyrics, and playlist toolkit"
+requires-python = ">=3.10"
+dependencies = [
+  "spotipy~=2.23.0",
+  "mutagen~=1.47.0",
+  "requests~=2.31.0",
+  "rich~=13.7.0",
+  "python-dotenv~=1.0.0",
+  "librosa~=0.10.0",
+  "soundfile~=0.12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest~=8.0.0",
+  "pytest-cov~=5.0.0",
+  "black~=24.0",
+  "flake8~=7.0",
+  "isort~=5.13",
+  "mypy~=1.8",
+  "pre-commit~=3.6",
+  "types-requests",
+]
+
+[tool.setuptools.packages.find]
+include = ["toolkit*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
+
+[tool.black]
+line-length = 120
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = true
+packages = ["toolkit"]

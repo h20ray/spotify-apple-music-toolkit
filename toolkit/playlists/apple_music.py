@@ -24,6 +24,32 @@ from toolkit.core import (
     http_post,
     ensure_all_folders,
 )
+from toolkit.core.constants import (
+    APPLE_BONUS_ARTIST_TITLE_MATCH,
+    APPLE_BONUS_EXACT_TITLE,
+    APPLE_BONUS_TITLE_MATCH,
+    APPLE_MUSIC_API_CHUNK_SIZE,
+    APPLE_MUSIC_API_RETRY_DELAY,
+    APPLE_PENALTY_ACOUSTIC,
+    APPLE_PENALTY_COMPILATION,
+    APPLE_PENALTY_KARAOKE,
+    APPLE_PENALTY_LIVE,
+    APPLE_PENALTY_NO_ARTIST,
+    APPLE_PENALTY_REMIX,
+    APPLE_PENALTY_UNWANTED_VERSION,
+    APPLE_SCORE_EXCELLENT,
+    APPLE_SCORE_GOOD,
+    APPLE_SCORE_MINIMUM,
+    APPLE_SCORE_MISMATCH,
+    CACHE_SAVE_INTERVAL,
+    DEFAULT_USER_AGENT,
+    MAX_RETRY_ATTEMPTS,
+    RATE_LIMIT_DELAY,
+    TIMEOUT_API_LONG,
+    TIMEOUT_API_SHORT,
+    USER_AGENTS,
+)
+from toolkit.core.logging import get_logger
 from toolkit.playlists.parser import (
     parse_songs,
     clean_string,
@@ -49,6 +75,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskPr
 from rich.prompt import Prompt, Confirm
 
 console = Console()
+logger = get_logger(__name__)
 
 SOURCE_FOLDER_NAME = "playlist_sources"
 EXPORT_FOLDER_NAME = os.path.join("playlist_exports", "apple_music")
@@ -60,11 +87,6 @@ CACHED_BEARER_TOKEN = [None]
 CACHE_FILE = os.path.join(CACHE_DIR, "apple_music_search_cache.json")
 LEGACY_CACHE_FILE = os.path.join(EXPORT_APPLE_MUSIC_DIR, "search_cache.json")
 SEARCH_CACHE = {}
-
-USER_AGENTS = [
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    'AppleMusic/1.0 (Macintosh; Intel Mac OS X 10_15_7)'
-]
 
 def ensure_folders():
     """Ensure project source and export directories exist."""
@@ -97,8 +119,10 @@ def load_search_cache():
                     if verify_track_match(song_key, t_name, a_name):
                         sanitized[song_key] = item
             SEARCH_CACHE = sanitized
-        except Exception:
+        except (OSError, json.JSONDecodeError, TypeError) as e:
+            logger.warning(f"Failed loading Apple Music search cache: {e}")
             SEARCH_CACHE = {}
+
 
 def save_search_cache():
     """Save search cache to disk in .cache/ folder (persisting matched Apple Music track details and URLs)."""
@@ -106,10 +130,10 @@ def save_search_cache():
     try:
         os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
         valid_cache = {k: v for k, v in SEARCH_CACHE.items() if v and isinstance(v, dict)}
-        with open(CACHE_FILE, 'w', encoding='utf-8') as f:
+        with open(CACHE_FILE, "w", encoding="utf-8") as f:
             json.dump(valid_cache, f, ensure_ascii=False, indent=2)
-    except Exception:
-        pass
+    except OSError as e:
+        logger.warning(f"Failed saving Apple Music search cache: {e}")
 
 def clear_search_cache_for_songs(songs=None):
     """Clear cached search results for specific songs or entire cache."""
@@ -132,7 +156,7 @@ def score_track_candidate(item, song_line, user_wants_remix, user_wants_live):
 
     # Strict artist & title disambiguation check (disqualifies mismatched songs like AB Three vs A.B.A. Three)
     if not verify_track_match(song_line, track_name, artist_name):
-        return -500.0
+        return APPLE_SCORE_MISMATCH
 
     tn_clean = clean_string(track_name)
     an_clean = clean_string(artist_name)
@@ -154,22 +178,34 @@ def score_track_candidate(item, song_line, user_wants_remix, user_wants_live):
                 matched_words += 0.9
 
     if words:
-        score += (matched_words / len(words)) * 60.0
+        score += (matched_words / len(words)) * APPLE_SCORE_GOOD
 
-    if ' - ' in song_line:
-        parts = song_line.split(' - ', 1)
+    if " - " in song_line:
+        parts = song_line.split(" - ", 1)
         p1_c = clean_string(parts[0])
         p2_c = clean_string(parts[1])
 
-        p1_primary = clean_string(re.split(r'\s*(?:&|,|/|\\|\bfeat\.\b|\bft\.\b|\bfeaturing\b|\bwith\b|\bvs\.\b|\bvs\b|\bx\b)\s*', parts[0], flags=re.IGNORECASE)[0])
-        p2_primary = clean_string(re.split(r'\s*(?:&|,|/|\\|\bfeat\.\b|\bft\.\b|\bfeaturing\b|\bwith\b|\bvs\.\b|\bvs\b|\bx\b)\s*', parts[1], flags=re.IGNORECASE)[0])
+        p1_primary = clean_string(
+            re.split(
+                r"\s*(?:&|,|/|\\|\bfeat\.\b|\bft\.\b|\bfeaturing\b|\bwith\b|\bvs\.\b|\bvs\b|\bx\b)\s*",
+                parts[0],
+                flags=re.IGNORECASE,
+            )[0]
+        )
+        p2_primary = clean_string(
+            re.split(
+                r"\s*(?:&|,|/|\\|\bfeat\.\b|\bft\.\b|\bfeaturing\b|\bwith\b|\bvs\.\b|\bvs\b|\bx\b)\s*",
+                parts[1],
+                flags=re.IGNORECASE,
+            )[0]
+        )
 
-        p1_no_the = re.sub(r'^\bthe\b\s*', '', p1_c) if p1_c else ""
-        p2_no_the = re.sub(r'^\bthe\b\s*', '', p2_c) if p2_c else ""
-        an_no_the = re.sub(r'^\bthe\b\s*', '', an_clean) if an_clean else ""
+        p1_no_the = re.sub(r"^\bthe\b\s*", "", p1_c) if p1_c else ""
+        p2_no_the = re.sub(r"^\bthe\b\s*", "", p2_c) if p2_c else ""
+        an_no_the = re.sub(r"^\bthe\b\s*", "", an_clean) if an_clean else ""
 
-        p1_primary_no_the = re.sub(r'^\bthe\b\s*', '', p1_primary) if p1_primary else ""
-        p2_primary_no_the = re.sub(r'^\bthe\b\s*', '', p2_primary) if p2_primary else ""
+        p1_primary_no_the = re.sub(r"^\bthe\b\s*", "", p1_primary) if p1_primary else ""
+        p2_primary_no_the = re.sub(r"^\bthe\b\s*", "", p2_primary) if p2_primary else ""
 
         p1_words = [w for w in p1_c.split() if len(w) >= 3]
         p2_words = [w for w in p2_c.split() if len(w) >= 3]
@@ -177,17 +213,21 @@ def score_track_candidate(item, song_line, user_wants_remix, user_wants_live):
         p1_all_words_in_art = bool(p1_words and all(w in an_clean or w in an_no_the for w in p1_words))
         p2_all_words_in_art = bool(p2_words and all(w in an_clean or w in an_no_the for w in p2_words))
 
-        p1_in_art = bool(p1_c and p1_c in an_clean) or \
-                    bool(p1_no_the and p1_no_the in an_no_the) or \
-                    p1_all_words_in_art or \
-                    bool(an_clean and len(an_clean) >= 3 and (an_clean in p1_c or an_no_the in p1_no_the)) or \
-                    bool(p1_primary and len(p1_primary) >= 3 and (p1_primary in an_clean or p1_primary_no_the in an_no_the))
+        p1_in_art = (
+            bool(p1_c and p1_c in an_clean)
+            or bool(p1_no_the and p1_no_the in an_no_the)
+            or p1_all_words_in_art
+            or bool(an_clean and len(an_clean) >= 3 and (an_clean in p1_c or an_no_the in p1_no_the))
+            or bool(p1_primary and len(p1_primary) >= 3 and (p1_primary in an_clean or p1_primary_no_the in an_no_the))
+        )
 
-        p2_in_art = bool(p2_c and p2_c in an_clean) or \
-                    bool(p2_no_the and p2_no_the in an_no_the) or \
-                    p2_all_words_in_art or \
-                    bool(an_clean and len(an_clean) >= 3 and (an_clean in p2_c or an_no_the in p2_no_the)) or \
-                    bool(p2_primary and len(p2_primary) >= 3 and (p2_primary in an_clean or p2_primary_no_the in an_no_the))
+        p2_in_art = (
+            bool(p2_c and p2_c in an_clean)
+            or bool(p2_no_the and p2_no_the in an_no_the)
+            or p2_all_words_in_art
+            or bool(an_clean and len(an_clean) >= 3 and (an_clean in p2_c or an_no_the in p2_no_the))
+            or bool(p2_primary and len(p2_primary) >= 3 and (p2_primary in an_clean or p2_primary_no_the in an_no_the))
+        )
 
         p1_in_title = bool(p1_c and (p1_c in tn_clean or tn_clean in p1_c))
         p2_in_title = bool(p2_c and (p2_c in tn_clean or tn_clean in p2_c))
@@ -198,15 +238,15 @@ def score_track_candidate(item, song_line, user_wants_remix, user_wants_live):
                 p2_in_title = True
 
         if (p1_in_art and p2_in_title) or (p2_in_art and p1_in_title):
-            score += 40.0
+            score += APPLE_BONUS_ARTIST_TITLE_MATCH
         elif p1_in_title or p2_in_title:
-            score += 20.0
+            score += APPLE_BONUS_TITLE_MATCH
 
         if (p1_in_art and p2_c and tn_clean == p2_c) or (p2_in_art and p1_c and tn_clean == p1_c):
-            score += 20.0
+            score += APPLE_BONUS_EXACT_TITLE
 
         if not p1_in_art and not p2_in_art:
-            score -= 80.0
+            score += APPLE_PENALTY_NO_ARTIST
 
     full_candidate_all = f"{tn_clean} {an_clean} {album_clean}"
 
@@ -214,7 +254,7 @@ def score_track_candidate(item, song_line, user_wants_remix, user_wants_live):
     if not user_wants_karaoke:
         for kw in KARAOKE_TRIBUTE_KEYWORDS:
             if kw in full_candidate_all:
-                score -= 100.0
+                score += APPLE_PENALTY_KARAOKE
                 break
 
     full_candidate_text = f"{tn_clean} {album_clean}"
@@ -222,28 +262,28 @@ def score_track_candidate(item, song_line, user_wants_remix, user_wants_live):
     if not user_wants_remix:
         for kw in UNWANTED_EDIT_KEYWORDS:
             if kw in full_candidate_text:
-                score -= 40.0
+                score += APPLE_PENALTY_REMIX
                 break
 
     if not user_wants_live:
         for kw in ["live", "live at", "in concert", "live in"]:
             if kw in full_candidate_text:
-                score -= 50.0
+                score += APPLE_PENALTY_LIVE
                 break
 
     user_wants_acoustic = "acoustic" in song_line.lower()
     if not user_wants_acoustic and "acoustic" in full_candidate_text:
-        score -= 50.0
+        score += APPLE_PENALTY_ACOUSTIC
 
     for kw in UNWANTED_VERSION_KEYWORDS:
         if kw in ["live", "acoustic", "instrumental"] and (user_wants_live or user_wants_remix or user_wants_acoustic):
             continue
         if kw in full_candidate_text:
-            score -= 30.0
+            score += APPLE_PENALTY_UNWANTED_VERSION
 
     for c_kw in COMPILATION_KEYWORDS:
         if c_kw in album_clean:
-            score -= 15.0
+            score += APPLE_PENALTY_COMPILATION
             break
 
     return score
@@ -259,14 +299,14 @@ def get_apple_developer_token():
         return dev_env
 
     try:
-        url = 'https://music.apple.com/assets/index~f0647adb63.js'
-        res = http_get(url, headers={'User-Agent': USER_AGENTS[0]}, timeout=6)
-        tokens = re.findall(r'ey[A-Za-z0-9\-_=]{20,}\.ey[A-Za-z0-9\-_=]{20,}\.[A-Za-z0-9\-_=]{20,}', res.text)
+        url = "https://music.apple.com/assets/index~f0647adb63.js"
+        res = http_get(url, headers={"User-Agent": USER_AGENTS[0]}, timeout=TIMEOUT_API_SHORT)
+        tokens = re.findall(r"ey[A-Za-z0-9\-_=]{20,}\.ey[A-Za-z0-9\-_=]{20,}\.[A-Za-z0-9\-_=]{20,}", res.text)
         if tokens:
             CACHED_BEARER_TOKEN[0] = tokens[0]
             return tokens[0]
-    except Exception:
-        pass
+    except (OSError, ValueError) as e:
+        logger.warning(f"Failed fetching Apple developer token: {e}")
 
     return None
 
@@ -302,44 +342,50 @@ def create_apple_music_cloud_playlist(playlist_name, tracks, user_token=None):
     }
 
     try:
-        resp = http_post(url_create, json=payload_create, headers=headers, timeout=10)
+        resp = http_post(url_create, json=payload_create, headers=headers, timeout=TIMEOUT_API_LONG)
         if resp.status_code in [200, 201]:
-            data = resp.json().get('data', [])
+            data = resp.json().get("data", [])
             if not data:
-                console.print(f"[bold red]API Error:[/bold red] Could not parse created playlist ID.")
+                console.print("[bold red]API Error:[/bold red] Could not parse created playlist ID.")
                 return False
 
-            playlist_id = data[0]['id']
+            playlist_id = data[0]["id"]
             console.print(f"[bold cyan]Playlist Container Created! (ID: {playlist_id})[/bold cyan]")
 
-            track_ids = [item.get('trackId') for item in tracks if item.get('trackId')]
+            track_ids = [item.get("trackId") for item in tracks if item.get("trackId")]
             all_track_objs = [{"id": str(tid), "type": "songs"} for tid in track_ids]
 
             url_add = f"https://amp-api.music.apple.com/v1/me/library/playlists/{playlist_id}/tracks"
-            chunk_size = 20
+            chunk_size = APPLE_MUSIC_API_CHUNK_SIZE
             added_count = 0
 
             for i in range(0, len(all_track_objs), chunk_size):
-                chunk = all_track_objs[i:i+chunk_size]
+                chunk = all_track_objs[i : i + chunk_size]
                 time.sleep(0.3)
 
-                for attempt in range(4):
-                    resp_add = http_post(url_add, json={"data": chunk}, headers=headers, timeout=10)
+                for attempt in range(MAX_RETRY_ATTEMPTS):
+                    resp_add = http_post(url_add, json={"data": chunk}, headers=headers, timeout=TIMEOUT_API_LONG)
                     if resp_add.status_code in [200, 201, 204]:
                         added_count += len(chunk)
-                        console.print(f"[dim]Synced {added_count}/{len(all_track_objs)} tracks to Apple Music Cloud...[/dim]")
+                        console.print(
+                            f"[dim]Synced {added_count}/{len(all_track_objs)} tracks to Apple Music Cloud...[/dim]"
+                        )
                         break
-                    elif resp_add.status_code == 429:
-                        time.sleep(2.0 * (attempt + 1))
+                    if resp_add.status_code == 429:
+                        time.sleep(APPLE_MUSIC_API_RETRY_DELAY * (attempt + 1))
                     else:
-                        console.print(f"[bold yellow]Batch Add Notice ({resp_add.status_code}):[/bold yellow] {resp_add.text[:150]}")
+                        console.print(
+                            f"[bold yellow]Batch Add Notice ({resp_add.status_code}):[/bold yellow] {resp_add.text[:150]}"
+                        )
                         break
 
-            console.print(f"[bold green]✓ SUCCESS! Playlist '{playlist_name}' ({added_count} tracks) synced directly to your Apple Music Account![/bold green]")
+            console.print(
+                f"[bold green]✓ SUCCESS! Playlist '{playlist_name}' ({added_count} tracks) synced directly to your Apple Music Account![/bold green]"
+            )
             return True
-        else:
-            console.print(f"[bold yellow]Apple Music API Notice ({resp.status_code}):[/bold yellow] {resp.text[:200]}")
-    except Exception as e:
+        console.print(f"[bold yellow]Apple Music API Notice ({resp.status_code}):[/bold yellow] {resp.text[:200]}")
+    except (OSError, ValueError, KeyError) as e:
+        logger.error(f"Apple Music cloud playlist API error: {e}")
         console.print(f"[bold red]API Exception:[/bold red] {e}")
 
     return False
@@ -366,41 +412,47 @@ def search_apple_music_track(song_line, is_trim_retry=False):
     url_itunes = "https://itunes.apple.com/search"
     for search_term in queries:
         params_itunes = {"term": search_term, "media": "music", "entity": "song", "limit": 10}
-        for attempt in range(4):
+        for attempt in range(MAX_RETRY_ATTEMPTS):
             try:
-                time.sleep(0.1)
-                resp = http_get(url_itunes, params=params_itunes, timeout=6)
+                time.sleep(RATE_LIMIT_DELAY)
+                resp = http_get(url_itunes, params=params_itunes, timeout=TIMEOUT_API_SHORT)
                 if resp.status_code == 200:
-                    results = resp.json().get('results', [])
+                    results = resp.json().get("results", [])
                     if results:
                         scored = []
                         for item in results:
                             s = score_track_candidate(item, song_line, user_wants_remix, user_wants_live)
-                            scored.append((s, {
-                                'trackId': item.get('trackId', 0),
-                                'trackName': item.get('trackName', ''),
-                                'artistName': item.get('artistName', ''),
-                                'collectionName': item.get('collectionName', ''),
-                                'trackTimeMillis': item.get('trackTimeMillis', 0),
-                                'trackViewUrl': item.get('trackViewUrl', '')
-                            }))
+                            scored.append(
+                                (
+                                    s,
+                                    {
+                                        "trackId": item.get("trackId", 0),
+                                        "trackName": item.get("trackName", ""),
+                                        "artistName": item.get("artistName", ""),
+                                        "collectionName": item.get("collectionName", ""),
+                                        "trackTimeMillis": item.get("trackTimeMillis", 0),
+                                        "trackViewUrl": item.get("trackViewUrl", ""),
+                                    },
+                                )
+                            )
                         scored.sort(key=lambda x: x[0], reverse=True)
                         if scored[0][0] > best_score:
                             best_score = scored[0][0]
                             best_candidate = scored[0][1]
 
-                        if best_score >= 75.0:
+                        if best_score >= APPLE_SCORE_EXCELLENT:
                             SEARCH_CACHE[song_line] = best_candidate
                             return best_candidate
                     break
-                elif resp.status_code == 429:
+                if resp.status_code == 429:
                     time.sleep(1.5 * (attempt + 1))
                 else:
                     break
-            except Exception:
+            except (OSError, ValueError, KeyError) as e:
+                logger.debug(f"iTunes search attempt failed: {e}")
                 time.sleep(0.3)
 
-    if best_candidate and best_score >= 75.0:
+    if best_candidate and best_score >= APPLE_SCORE_EXCELLENT:
         SEARCH_CACHE[song_line] = best_candidate
         return best_candidate
 
@@ -417,81 +469,97 @@ def search_apple_music_track(song_line, is_trim_retry=False):
             params_amp = {"term": search_term, "types": "songs", "limit": 10}
             for attempt in range(3):
                 try:
-                    time.sleep(0.1)
-                    resp = http_get(url_amp, params=params_amp, headers=headers_amp, timeout=6)
+                    time.sleep(RATE_LIMIT_DELAY)
+                    resp = http_get(url_amp, params=params_amp, headers=headers_amp, timeout=TIMEOUT_API_SHORT)
                     if resp.status_code == 200:
-                        data = resp.json().get('results', {}).get('songs', {}).get('data', [])
+                        data = resp.json().get("results", {}).get("songs", {}).get("data", [])
                         if data:
                             scored = []
                             for item in data:
-                                attr = item.get('attributes', {})
+                                attr = item.get("attributes", {})
                                 s = score_track_candidate(item, song_line, user_wants_remix, user_wants_live)
-                                raw_url = attr.get('url', '')
-                                clean_url = raw_url.split('&uo=')[0] if raw_url else ''
+                                raw_url = attr.get("url", "")
+                                clean_url = raw_url.split("&uo=")[0] if raw_url else ""
 
-                                scored.append((s, {
-                                    'trackId': item.get('id', 0),
-                                    'trackName': attr.get('name', ''),
-                                    'artistName': attr.get('artistName', ''),
-                                    'collectionName': attr.get('albumName', ''),
-                                    'trackTimeMillis': attr.get('durationInMillis', 0),
-                                    'trackViewUrl': clean_url
-                                }))
+                                scored.append(
+                                    (
+                                        s,
+                                        {
+                                            "trackId": item.get("id", 0),
+                                            "trackName": attr.get("name", ""),
+                                            "artistName": attr.get("artistName", ""),
+                                            "collectionName": attr.get("albumName", ""),
+                                            "trackTimeMillis": attr.get("durationInMillis", 0),
+                                            "trackViewUrl": clean_url,
+                                        },
+                                    )
+                                )
 
                             scored.sort(key=lambda x: x[0], reverse=True)
                             if scored[0][0] > best_score:
                                 best_score = scored[0][0]
                                 best_candidate = scored[0][1]
 
-                            if best_score >= 60.0:
+                            if best_score >= APPLE_SCORE_GOOD:
                                 SEARCH_CACHE[song_line] = best_candidate
                                 return best_candidate
                         break
-                    elif resp.status_code == 429:
+                    if resp.status_code == 429:
                         time.sleep(1.5 * (attempt + 1))
                     else:
                         break
-                except Exception:
-                    pass
+                except (OSError, ValueError, KeyError) as e:
+                    logger.debug(f"AMP catalog search failed: {e}")
 
-    if best_candidate and best_score > 15.0:
+    if best_candidate and best_score > APPLE_SCORE_MINIMUM:
         SEARCH_CACHE[song_line] = best_candidate
         return best_candidate
 
     # Step 3: Fallback to Deezer API
     url_deezer = "https://api.deezer.com/search"
-    headers_dz = {"User-Agent": USER_AGENTS[0]}
+    headers_dz = {"User-Agent": DEFAULT_USER_AGENT}
     for search_term in queries:
         params_deezer = {"q": search_term}
         try:
-            time.sleep(0.1)
-            resp_dz = http_get(url_deezer, params=params_deezer, headers=headers_dz, timeout=6)
+            time.sleep(RATE_LIMIT_DELAY)
+            resp_dz = http_get(url_deezer, params=params_deezer, headers=headers_dz, timeout=TIMEOUT_API_SHORT)
             if resp_dz.status_code == 200:
                 data_dz = resp_dz.json()
-                results_dz = data_dz.get('data', [])
+                results_dz = data_dz.get("data", [])
                 if results_dz:
                     scored_dz = []
                     for item in results_dz:
                         s = score_track_candidate(item, song_line, user_wants_remix, user_wants_live)
-                        dz_title = item.get('title', '')
-                        dz_artist = item.get('artist', {}).get('name', '') if isinstance(item.get('artist'), dict) else ''
+                        dz_title = item.get("title", "")
+                        dz_artist = (
+                            item.get("artist", {}).get("name", "") if isinstance(item.get("artist"), dict) else ""
+                        )
 
-                        scored_dz.append((s, {
-                            'trackId': 0,
-                            'trackName': dz_title,
-                            'artistName': dz_artist,
-                            'collectionName': item.get('album', {}).get('title', '') if isinstance(item.get('album'), dict) else '',
-                            'trackTimeMillis': item.get('duration', 0) * 1000,
-                            'trackViewUrl': ''
-                        }))
+                        scored_dz.append(
+                            (
+                                s,
+                                {
+                                    "trackId": 0,
+                                    "trackName": dz_title,
+                                    "artistName": dz_artist,
+                                    "collectionName": (
+                                        item.get("album", {}).get("title", "")
+                                        if isinstance(item.get("album"), dict)
+                                        else ""
+                                    ),
+                                    "trackTimeMillis": item.get("duration", 0) * 1000,
+                                    "trackViewUrl": "",
+                                },
+                            )
+                        )
 
                     scored_dz.sort(key=lambda x: x[0], reverse=True)
-                    if scored_dz[0][0] > 15.0:
+                    if scored_dz[0][0] > APPLE_SCORE_MINIMUM:
                         result = scored_dz[0][1]
                         SEARCH_CACHE[song_line] = result
                         return result
-        except Exception:
-            pass
+        except (OSError, ValueError, KeyError, TypeError) as e:
+            logger.debug(f"Deezer search failed: {e}")
 
     # Step 4: Smart Title Trimming Disambiguation
     if ' - ' in song_line and not is_trim_retry:
@@ -540,7 +608,7 @@ def process_track_batch(songs, progress=None, task=None):
                 progress.update(task, description=f"[dim]Processing ({i}/{len(songs)})[/dim]")
                 progress.advance(task)
 
-            if i % 5 == 0:
+            if i % CACHE_SAVE_INTERVAL == 0:
                 save_search_cache()
     except KeyboardInterrupt:
         console.print("\n[bold yellow]Process interrupted by user (Ctrl+C). Saving current search progress to cache...[/bold yellow]")
