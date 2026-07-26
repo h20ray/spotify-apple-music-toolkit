@@ -264,6 +264,7 @@ def interactive_menu(sp, user_info):
         console.print(" [bold cyan]2[/bold cyan] Select One File to Create a Spotify Playlist")
         console.print(" [bold cyan]3[/bold cyan] Create Playlists for All Files (Batch Mode)")
         console.print(" [bold cyan]4[/bold cyan] User Guide")
+        console.print()
         console.print(" [bold cyan]0[/bold cyan] Return to Main Menu")
 
         choice = Prompt.ask("\nSelect option", choices=["1", "2", "3", "4", "0"], default="1")

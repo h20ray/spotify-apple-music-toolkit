@@ -189,6 +189,7 @@ def main() -> None:
             " [bold bright_white]7[/bold bright_white] "
             "[bold yellow]View Workspace Files & Status[/bold yellow]"
         )
+        console.print()
         console.print(" [bold bright_white]0[/bold bright_white] [dim white]Exit[/dim white]")
 
         choice = Prompt.ask("\nSelect option", choices=["1", "2", "3", "4", "5", "6", "7", "0"], default="1")

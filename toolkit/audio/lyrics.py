@@ -467,6 +467,7 @@ def main():
         console.print(" [bold cyan]1[/bold cyan] Sync Lyrics for Local Audio Files (audio_library/) [Multi-Threaded]")
         console.print(" [bold cyan]2[/bold cyan] Download Lyrics for Playlist Text Files (playlist_sources/)")
         console.print(" [bold cyan]3[/bold cyan] Search & Download Lyrics for a Single Track")
+        console.print()
         console.print(" [bold cyan]0[/bold cyan] Return to Main Menu")
 
         choice = Prompt.ask("\nSelect option", choices=["1", "2", "3", "0"], default="1")
