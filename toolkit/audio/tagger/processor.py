@@ -57,8 +57,10 @@ def _process_single_tagger_worker(fname, folder_path, mode, sp, thread_slot, pro
     query = pre_sanitize_song_line(query)
 
     with STATUS_LOCK:
-        worker_status[thread_slot] = f"[bold cyan]Thread #{thread_slot
-                                                           + 1:02d}[/bold cyan] Tagging: [white]{query[:50]}[/white]"
+        worker_status[thread_slot] = (
+            f"[bold cyan]Thread #{thread_slot + 1:02d}[/bold cyan] "
+            f"Tagging: [white]{query[:50]}[/white]"
+        )
 
     try:
         bpm_val = existing['bpm'] or detect_physical_bpm(file_path)
@@ -159,8 +161,9 @@ def process_audio_folder(folder_path=AUDIO_LIBRARY_DIR, mode=None, max_workers=D
         return
 
     console.print(
-        f"\n[bold green]Found {
-            len(audio_files)} audio file(s) | Multi-Threaded Engine ({max_workers} threads)...[/bold green]")
+        f"\n[bold green]Found {len(audio_files)} audio file(s) | "
+        f"Multi-Threaded Engine ({max_workers} threads)...[/bold green]"
+    )
 
     if not mode:
         mode = select_tagging_mode()

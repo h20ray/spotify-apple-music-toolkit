@@ -117,8 +117,10 @@ def process_album_art_fixer(folder_path: str = AUDIO_LIBRARY_DIR, max_workers: i
         return
 
     console.print(
-        f"\n[bold green]Found {
-            len(audio_files)} audio file(s) | Multi-Threaded Cover Art Fixer ({max_workers} threads)...[/bold green]")
+        f"\n[bold green]Found {len(audio_files)} audio file(s) | "
+        f"Multi-Threaded Cover Art Fixer ({max_workers} threads)..."
+        f"[/bold green]"
+    )
 
     results: list[dict[str, Any]] = []
     progress = Progress(

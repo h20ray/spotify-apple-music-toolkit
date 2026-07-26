@@ -240,8 +240,10 @@ def sync_audio_library_lyrics(max_workers=DEFAULT_MAX_WORKERS):
         return
 
     console.print(
-        f"\n[bold green]Syncing Synced Lyrics for {
-            len(audio_files)} audio file(s) | Multi-Threaded Engine ({max_workers} threads)...[/bold green]\n")
+        f"\n[bold green]Syncing Synced Lyrics for {len(audio_files)} "
+        f"audio file(s) | Multi-Threaded Engine ({max_workers} threads)..."
+        f"[/bold green]\n"
+    )
 
     results = []
     progress = Progress(
