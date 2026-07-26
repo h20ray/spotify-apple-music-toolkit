@@ -182,5 +182,6 @@ def main() -> None:
             console.print("\n[bold cyan]Thank you for using Spotify - Apple Music Toolkit. Goodbye![/bold cyan]")
             sys.exit(0)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
