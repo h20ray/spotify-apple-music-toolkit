@@ -1,0 +1,169 @@
+Name	Artist	Composer	Album	Genre	Size	Time	Disc Number	Disc Count	Track Number	Track Count	Year	Date Modified	Date Added	Bit Rate	Sample Rate	Volume Adjustment	Kind	Equalizer	Comments	Play Count	Last Played	Skip Count	Last Skipped	My Rating	Location
+Selamat Datang Cinta	AB Three		Selamat Datang CInta			267																			
+Aku Tak Biasa	Alda		Aku Tak Biasa			286																			
+Cinta Kita	Inka Christie		Album No. 1 Inka Christie			331																			
+Berartinya Dirimu	Anang & Kris Dayanti		Dilanda Cinta			271																			
+Di Hati	Anang & Kris Dayanti		10 Tahun Pertama			335																			
+Cinta	Anang & Kris Dayanti		Dilanda Cinta			282																			
+Aku Memilihmu	Anang Hermansyah & Ashanty		Aku Memilihmu - Single			303																			
+Separuh Jiwaku Pergi	Anang Hermansyah		Separuh Jiwaku Pergi - EP			220																			
+Bidadari	Andre Hehanussa		The Best of Andre Hehanussa			310																			
+Kuta Bali	Andre Hehanussa		The Best of Andre Hehanussa			342																			
+Mimpi	Anggun		Mini Collection, Anggun C. Sasmi - EP			254																			
+Tua-Tua Keladi	Anggun		Mini Collection, Anggun C. Sasmi - EP			306																			
+Misteri Ilahi	Ari Lasso		Yang Terbaik			233																			
+Nelangsa	Ari Lasso		Sendiri Dulu			178																			
+Kau Dimana	Atiek CB		Terbaik Dari Aku			287																			
+Terserah Boy	Atiek CB		Terbaik Dari Aku			253																			
+Bermimpi	Base Jam		Bermimpi			253																			
+Bukan Pujangga	Base Jam		Ti3a			246																			
+Hujan Tanpa Awan	Base Jam		9th : The Best of 1993 - 2002			221																			
+Ada Cinta	Bening		Ada Cinta			245																			
+Janji	Bragi		The Best of Bragi			331																			
+Ulurkan Tanganmu	Bragi		The Best of Bragi			231																			
+Oh Angin	Broery Pesulima		Aku Begini Engkau Begitu			318																			
+Kasih Jangan Kau Pergi	Bunga Band		Kasih Jangan Kau Pergi - Single			298																			
+Bunga Beracun	KASSIM SELAMAT		Bintang Pop 60'an, Vol. 2			164																			
+Hidupku Kan Damaikan Hatimu	Caffeine		Hijau			246																			
+Kau Yang T'lah Pergi	Caffeine		Hijau			282																			
+Cintaku	Chrisye		Badai Pasti Berlalu			278																			
+Kala Cinta Menggoda	Chrisye		Chrisye "Untukku"			320																			
+Pergilah Kasih	Chrisye		Pergilah Kasih			282																			
+Sendiri Lagi	Chrisye		Sendiri Lagi			278																			
+Cintaku Tak Terbatas Waktu	Deddy Dores		Cintaku Tak Terbatas Waktu			286																			
+Takdir	Desy Ratnasari		Takdir			287																			
+Tenda Biru	Desy Ratnasari		Artis Terfavorit (1999-2000)			320																			
+Aku Milikmu	Dewa 19		Format Masa Depan			332																			
+Cinta 'kan Membawamu Kembali	Dewa 19		Terbaik Terbaik			259																			
+Cukup Siti Nurbaya	Dewa 19		Terbaik Terbaik			287																			
+Elang	Dewa 19		The Best of Dewa 19			261																			
+Kamulah Satu - Satunya	Dewa 19		Pandawa Lima			239																			
+Kangen	Dewa 19		The 2000's Greatest			300																			
+Kirana	Dewa 19 & Virzha		Kirana - Single			275																			
+Kita Tidak Sedang Bercinta Lagi	Dewa 19		Dewa 19			288																			
+Satu Hati	Dewa 19		Terbaik Terbaik			327																			
+Ruang Dialisis	Dewa Budjana		Hasta Karma			703																			
+Kini Baru Kau Rasa	Dewi Yull		Koleksi Terlengkap Dewi Yull			268																			
+Jangan Ada Dusta Diantara Kita (Versi Keroncong)	Dewi Yull		20 Best of The Best Pop Keroncong			264																			
+Damai Mimpi	dr.pm		Sosok			275																			
+Pernah Mencoba	dr.pm		Dunia Baru			284																			
+Karena Ku Sayang kamu (KKSK)	Dygta, Hengky Kurniawan & Sonya Fatmala		Collab 2020 - Single			341																			
+Hanyalah Cinta	Element		Hanyalah Cinta			241																			
+Mencari Alasan	Exists		Mencari Alasan			331																			
+Selalu Untuk Selamanya	Fatur		Selalu Untuk Selamanya			254																			
+Angan	GIGI		The Best of Gigi			281																			
+Janji	Gigi		Andai			75																			
+Kurindukan	GIGI		The Best of Gigi			293																			
+Dakin Gigi Merasa Coklat	Bayu Nirwana		Dakin Gigi Merasa Coklat - Single			276																			
+Terbang	GIGI		Kilas Balik			307																			
+Cukup Sudah	Glenn Fredly		Glenn			283																			
+Kau	Glenn Fredly		Detik Waktu : Perjalanan Karya Cipta Candra Darusman			251																			
+Mobil Mama	Glenn Fredly		Glenn			255																			
+Sebatas Mimpi	Hedi Yunus		Asmara			267																			
+Suratku	Hedi Yunus		Suratku			239																			
+Terserah	Humania		Terserah			252																			
+Suci Dalam Debu	Iklim		Emas Selamanya			286																			
+Cinta Kita	Inka Christie & Nike Ardilla		Karya Besar: Dari Sahabat Untuk Nike Ardilla (Vol. 1) - EP			230																			
+Gambaran Cinta	Inka Christie		Gambaran Cinta			281																			
+Cintaku Padamu	Ita Purnamasari		3 Dekade - Kumpulan Hits Terbaik			264																			
+Penari Ular	Ita Purnamasari		Penari Ular			316																			
+Bebas	Iwa K		Topeng			216																			
+Kuingin Kembali	Iwa K		Kuingin Kembali			300																			
+Malam Indah	Iwa K		Mesin Imajinasi			231																			
+Belum Ada Judul	Iwan Fals		Belum Ada Judul (Kompilasi)			233																			
+Bento	Iwan Fals		Swami, Vol. 1			359																			
+Bongkar	Iwan Fals		Swami, Vol. 1			431																			
+Gerangan Cinta	Java Jive		Java Jive II			324																			
+Kau Yang Terindah	Java Jive		Java Jive I			185																			
+Menikah	Java Jive		Java Jive I			259																			
+Permataku	Java Jive		Java Jive II			333																			
+Aku, Dirimu, Dirinya	Kahitna		Cerita Cinta 25 Tahun Kahitna			195																			
+Cantik	Kahitna		Cerita Cinta 25 Tahun Kahitna			240																			
+Cerita Cinta	Kahitna		Cerita Cinta 25 Tahun Kahitna			263																			
+Dinda, Dimana	Katon Bagaskara		Katon Bagaskara			293																			
+Negeri Di Awan	Katon Bagaskara		Katon Bagaskara			248																			
+Menjemput Impian	KLa Project		Broken Heart			258																			
+Tak Bisa Ke Lain Hati	KLa Project		DEKADE 1988 - 1998			314																			
+Terpuruk Ku Disini	KLa Project		Ungu			328																			
+Yogyakarta	KLa Project		Best Cuts			306																			
+Bila Kuingat	Lingua & Nagita Slavina		Bila Kuingat - Single			199																			
+Jangan Kau Henti (Remastered)	Lingua		The Singles Collection - EP			277																			
+Harus Malam Ini	Mayangsari		The Best: Harus Malam Ini			326																			
+Tiada Lagi	Mayangsari		Tiada Lagi			382																			
+Ingin Mencintai dan Dicinta	Melly Goeslaw		Ada Apa Dengan Cinta (Original Soundtrack)			258																			
+Jika	Melly Goeslaw		Melly			324																			
+Kamu	Melly Goeslaw		Eiffel... I'm In Love			185																			
+Hati Yang Kecewa	Nafa Urbach		Golden Best			344																			
+Yang Tak Pernah Bisa Mencintaimu	NaFF		Terlahir			247																			
+Tertipu	Nugie		Bumi			307																			
+Sebuah Renungan	Neno Warisman		Best of Neno Warisman			193																			
+Nurani	Netral		Paten			339																			
+Biar Semua Hilang	Nicky Astria		Samar Bayangan - EP			290																			
+Mengapa	Nicky Astria		Retrospective			228																			
+Bintang Kehidupan	Nike Ardilla		Koleksi Terlengkap			269																			
+Nyalakan Api	Nike Ardilla		Zona Slow Rock			318																			
+Sandiwara Cinta	Nike Ardilla		Koleksi Terlengkap			290																			
+Suara Hatiku	Nike Ardilla		Suara Hatiku			263																			
+Tinggallah Aku Sendiri	Nike Ardilla		Koleksi Terlengkap			257																			
+Anggun	Once Mekel		Anggun - Single			268																			
+Ingat Ingat Pesan Mama	Oppie Andaresta		Bidadari Badung - EP			218																			
+Single Happy	Oppie Andaresta		The Best of Top			261																			
+Begitu Indah	Padi		Lain Dunia			308																			
+Mahadewi	Padi		Lain Dunia			251																			
+Seperti Kekasihku	Padi		Lain Dunia			273																			
+Merpati Tak Pernah Ingkar Janji	Paramitha Rusady		Lagu Lagu Pilihan Pemirsa			276																			
+Nostalgia SMA	Paramitha Rusady		Lagu Lagu Pilihan Pemirsa			295																			
+Kesepian Kita (feat. Tere)	Pas Band		The Beast of Pas			287																			
+Seperti	Plastik		The Best Plastik			254																			
+Antara Jakarta Dan Penang	Poppy Mercury		Terlambat Sudah			345																			
+Surat Undangan	Poppy Mercury		Poppy Mercury (Seleksi Terbaik 2004)			257																			
+Diam	POTRET		Cafe			260																			
+Mak Comblang	POTRET		Potret II			145																			
+Salah	POTRET		Potret II			203																			
+Terbujuk	POTRET		Potret			243																			
+Kiranya	Protonema		Protonema			291																			
+Rinduku Adinda	Protonema		November			284																			
+Setangkai Anggrek Bulan	Rano Karno		Koleksi Lengkap Rano Karno			264																			
+Biar Menjadi Kenangan	Reza Artamevia		The Voicer			317																			
+Keabadian	Reza Artamevia		Keabadian			247																			
+Pertama	Reza Artamevia		Keajaiban			288																			
+Satu Yang Tak Bisa Lepas	Reza Artamevia		Keajaiban			325																			
+Ku Ada Di Sini	Rio Febrian		Ku Ada Disini			351																			
+Bunga Terakhir	Romeo		Romeo			294																			
+Kau dan Aku	Atiek CB & Ronnie sianturi		Love Duets			311																			
+Melangkah Diatas Awan	Ronnie Sianturi		Melangkah Diatas Awan			254																			
+5cm	Roxx		ANTHEM			379																			
+Kaulah Segalanya	Titi DJ & Ruth Sahanaya		Truth (About Us)			268																			
+Kaulah Segalanya	Titi DJ & Ruth Sahanaya		Truth (About Us)			268																			
+Keliru	Ruth Sahanaya		Love Theme			259																			
+Oh Kasih...	Shanty		9907			261																			
+Anugerah Terindah Yang Pernah Kumiliki	Sheila On 7		Sheila On 7			268																			
+Dan...	Sheila On 7		Sheila On 7			288																			
+J.A.P	Sheila On 7		OST. 30 Hari Mencari Cinta			283																			
+Kita	Sheila On 7		Sheila On 7			276																			
+Aku Cinta Padamu	Siti Nurhaliza		Aku Cinta Padamu			328																			
+Cindai	Siti Nurhaliza		Cindai			296																			
+Resting Take	Charcoal Sketches		Sketching Breeze			219																			
+Gerimis Mengundang	Slam		100 Lagu - Lagu Popular Pilihan DJ Chuari Selamat			326																			
+Balikin	Slank		Tujuh			277																			
+Bang Bang Tut	Slank		Minoritas			175																			
+Kamu Harus Pulang	Slank		Generasi Biru			300																			
+Maafkan	Slank		Suit Suit... He He Gadis Sexy			291																			
+Mawar Merah	Slank		Kampungan			275																			
+Terlalu Manis	Slank		Kampungan			248																			
+Cinta Suci	Stinky		The Best Stinky			300																			
+Jangan Tutup Dirimu	Stinky		The Best Stinky			300																			
+Mungkinkah	Stinky		Mungkinkah - Single			353																			
+Kau	T-Five		Kau - Single			295																			
+Pelangi Semu (Remix)	The Fly		THE FLY (Remastered)			189																			
+Terbang	The Fly		THE FLY (Remastered)			251																			
+Bahasa Kalbu	Titi DJ		Bahasa Kalbu - Single			271																			
+Jangan Berhenti Mencintaiku	Titi DJ		Bahasa Kalbu - Single			278																			
+Untukmu	Tito Soemarsono		Untukmu - Single			220																			
+Cinta Terpendam	Uuk Simatupang		Cinta Terpendam - Single			261																			
+Surat Cinta	Vina Panduwinata		Cium Pipiku			272																			
+Damai	Wayang		Damai - Single			187																			
+Dongeng	Wayang		Dongeng			238																			
+Tak Ingin	Wong		Wong			284																			
+Desember Kelabu	Yuni Shara		15 Lagu Terbaik			322																			
+Mengapa Tiada Maaf	Yuni Shara		Lagu-Lagu Pop Indonesia Terbaik, Vol. 2			326																			

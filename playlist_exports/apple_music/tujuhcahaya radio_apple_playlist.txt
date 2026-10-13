@@ -1,0 +1,162 @@
+Name	Artist	Composer	Album	Genre	Size	Time	Disc Number	Disc Count	Track Number	Track Count	Year	Date Modified	Date Added	Bit Rate	Sample Rate	Volume Adjustment	Kind	Equalizer	Comments	Play Count	Last Played	Skip Count	Last Skipped	My Rating	Location
+Miracle	Above & Beyond & OceanLab		Sirens of the Sea			403																			
+Sun & Moon (Beruit Demo) [feat. Richard Bedford] [Bonus Track]	Above & Beyond		Group Therapy (Bonus Track Version)			444																			
+Silhouette (feat. Ellie Goulding)	Active Child		Rapor - EP			248																			
+Easy On Me	Adele		30			224																			
+Rich Man	aespa		Rich Man - The 6th Mini Album - EP			197																			
+Ordinary	Alex Warren		Ordinary - Single			186																			
+Cry (feat. Buddy)	Alison Wonderland		Awake			199																			
+Forever Young	Alphaville		First Harvest 1984-1992			226																			
+7 rings	Ariana Grande		thank u, next			178																			
+no tears left to cry	Ariana Grande		Sweetener			205																			
+thank u, next	Ariana Grande		thank u, next			207																			
+Stuck with U	Ariana Grande & Justin Bieber		Stuck with U - Single			228																			
+So Far Away	Avenged Sevenfold		Nightmare			326																			
+A Song for XX	Ayumi Hamasaki		A Song for XX			284																			
+Dearest	Ayumi Hamasaki		Dearest			333																			
+Evermore (feat. Enfant Sauvage)	Ben Böhmer		Bloom			205																			
+Faithless (feat. Erin LeCount)	Ben Böhmer		Bloom			215																			
+Beautiful Things	Benson Boone		Beautiful Things - Single			180																			
+Mystical Magical	Benson Boone		Summer Chill			165																			
+BIRDS OF A FEATHER	Billie Eilish		HIT ME HARD AND SOFT			210																			
+CHIHIRO	Billie Eilish		HIT ME HARD AND SOFT			303																			
+WILDFLOWER	Billie Eilish		HIT ME HARD AND SOFT			261																			
+Love Really Hurts Without You	Billy Ocean		70s 100 Hits			180																			
+I'm Lost Without You	blink-182		Blink-182 (Bonus Track Version)			380																			
+What Becomes of the Broken Hearted	Boyzone		Break My Heart: Pop			195																			
+Maybe It's Time	Bradley Cooper		A Star Is Born Soundtrack			159																			
+If	Bread		Manna			155																			
+Gonna Be Okay	Brent Morgan		Gonna Be Okay - Single			210																			
+Fireworks	Carpark North		All Things To All People			267																			
+Heart of Me	Carpark North		All Things To All People			283																			
+Pink Pony Club	Chappell Roan		The Rise and Fall of a Midwest Princess			258																			
+Bluebird	Christina Perri		Lovestrong.			229																			
+Miracle	CHVRCHES		Love Is Dead			188																			
+Really Gone	CHVRCHES		Love Is Dead			191																			
+No Broke Boys	Disco Lines & Tinashe		No Broke Boys - Single			163																			
+Lose My Mind (feat. Doja Cat)	Don Toliver		F1 The Album			209																			
+Perfect	Ed Sheeran		÷			263																			
+Shape of You	Ed Sheeran		÷ (Deluxe)			233																			
+A Man Without Love	Engelbert Humperdinck		A Man Without Love			203																			
+Hero	Family of the Year		Loma Vista			190																			
+Welcome	Fort Minor		Welcome - Single			212																			
+Don't Worry About Me	Frances		Things I've Never Said (Deluxe)			221																			
+Prema	Fujii Kaze		Prema			262																			
+Sailor Song	Gigi Perez		Sailor Song - Single			211																			
+The Motivation Proclamation	Good Charlotte		Good Charlotte			216																			
+The Truth	Good Charlotte		The Chronicles of Life and Death (Life Version)			236																			
+That’s So True	Gracie Abrams		The Secret of Us (Deluxe)			166																			
+Give Me Novacaine	Green Day		American Idiot			206																			
+Last Night On Earth	Green Day		21st Century Breakdown			236																			
+When It's Time (4-track demo)	Green Day		Demos			154																			
+Could Have Been Me	Halsey		Sing 2 (Original Motion Picture Soundtrack)			148																			
+First Love	Hikaru Utada		First Love - EP			258																			
+Golden	HUNTR/X, EJAE, AUDREY NUNA, REI AMI & KPop Demon Hunters Cast		Golden (From the Netflix film "KPop Demon Hunters") - EP			194																			
+Ur Alive	ILLENIUM & WYLDE		Refuge / Ur Alive - Single			210																			
+Whatever It Takes	Imagine Dragons		Evolve			201																			
+If Not Now, When?	Incubus		If Not Now, When?			305																			
+Look What You've Done	Jet		Get Born			230																			
+Have I Told You Lately That I Love You (Acoustic)	John Adams		Have I Told You Lately That I Love You (Acoustic) - Single			201																			
+Wide Awake	Josh Record		Pillars (Deluxe Version)			272																			
+BETTER MAN	Justin Bieber		SWAG II			169																			
+DAISIES	Justin Bieber		SWAG			176																			
+Runaway (feat. Pusha T)	Kanye West & Pusha T		My Beautiful Dark Twisted Fantasy			547																			
+Folded	Kehlani		Kehlani			237																			
+Not Like Us	Kendrick Lamar		Not Like Us - Single			274																			
+I Like the Way You Kiss Me (Techno-Mix)	KOSKA		I Like the Way You Kiss Me (Techno-Mix) - Single			127																			
+Naked Alone	L Devine & INDIIA		Near Life Experience Part One			217																			
+The Dead Dance	Lady Gaga		The Dead Dance - Single			228																			
+Die With A Smile	Lady Gaga & Bruno Mars		Die With A Smile - Single			251																			
+'Cause You Have To	LANY		a beautiful blur			250																			
+Last Forever	LANY		Soft			223																			
+XXL	LANY		a beautiful blur			206																			
+Mean It	LAUV & LANY		~How I'm Feeling~			232																			
+Lost in Space	Lighthouse Family		Postcards from Heaven			322																			
+Trigger Bang (feat. Giggs)	Lily Allen		No Shame			212																			
+Waiting for the End	LINKIN PARK		Waiting for the End - Single			231																			
+Fighting With Myself (Live)	LP		Forever For Now (Deluxe Edition)			276																			
+Thunderclouds (feat. Sia, Diplo & Labrinth)	LSD		LABRINTH, SIA & DIPLO PRESENT... LSD			187																			
+Find Yourself	Lukas Nelson & Promise of the Real		Lukas Nelson & Promise of the Real			376																			
+Wait	M83		Hurry Up, We're Dreaming			343																			
+Burning Blue	Mariah the Scientist		HEARTS SOLD SEPARATELY			206																			
+Pray (High Valyrian)	Matt Bellamy		For the Throne (Music Inspired by the HBO Series "Game of Thrones")			234																			
+Counting Down the Days	MCC [Magna Carta Cartel]		Counting Down the Days - Single			300																			
+Comforting Sounds	Mew		Eggs Are Funny			530																			
+Porcelain (Arty Remix)	Moby		Porcelain (The Remixes) - Single			211																			
+Lilac	Mrs. GREEN APPLE		Lilac - Single			288																			
+Aftermath	Muse		Drones			347																			
+Blackout	Muse		Absolution			262																			
+Citizen Erased	Muse		Origin of Symmetry			439																			
+Easily	Muse		Starlight - EP			221																			
+Endlessly	Muse		Absolution			229																			
+Endlessly	Muse		Absolution			229																			
+Falling Down	Muse		Showbiz			273																			
+Get Up and Fight	Muse		Simulation Theory (Super Deluxe)			244																			
+Ghosts (How Can I Move On)	Muse		Will Of The People			217																			
+Something Human	Muse		Simulation Theory (Super Deluxe)			226																			
+The Dark Side	Muse		Simulation Theory (Super Deluxe)			227																			
+Unintended	Muse		Showbiz			237																			
+Disenchanted	My Chemical Romance		The Black Parade			295																			
+Backburner	NIKI		Nicole			236																			
+You'll Be In My Heart	NIKI		You'll Be In My Heart - Single			241																			
+Corners of the Earth (feat. RY X)	ODESZA		A Moment Apart			305																			
+Heavier	ODESZA & Yellow House		Flaws in Our Design - EP			257																			
+Man I Need	Olivia Dean		The Art of Loving			184																			
+Welcome Home (Remastered 2023)	Peters & Lee		Welcome Home (Remastered 2023) - Single			263																			
+Creep	Radiohead		Pablo Honey			238																			
+Let Down	Radiohead		OK Computer			299																			
+Love Me Not	Ravyn Lenae		Bird's Eye			213																			
+Girls (feat. Cardi B, Bebe Rexha & Charli XCX)	Rita Ora		Girls (feat. Cardi B, Bebe Rexha & Charli XCX) - Single			221																			
+Angels	Robbie Williams		Life Thru a Lens			265																			
+Better Man	Robbie Williams		Sing When You're Winning			204																			
+Feel	Robbie Williams		Escapology			263																			
+Millennium	Robbie Williams		I've Been Expecting You			247																			
+She's the One	Robbie Williams		I've Been Expecting You			258																			
+I Don't Want to Talk About It (1989 Version)	Rod Stewart		Sad Songs - I Won't GIve Up			290																			
+If Tomorrow Never Comes	Ronan Keating		2000's HITS			214																			
+APT.	ROSÉ & Bruno Mars		rosie			169																			
+Milk and Toast and Honey	Roxette		The 30 Biggest Hits XXX			244																			
+Innerbloom	RÜFÜS DU SOL		Bloom			578																			
+Free	Rumi, JINU, EJAE, Andrew Choi & KPop Demon Hunters Cast		KPop Demon Hunters (Soundtrack from the Netflix Film)			187																			
+Don’t Worry I’ll Make You Worry	Sabrina Carpenter		Pop chill			222																			
+Espresso	Sabrina Carpenter		Espresso - Single			175																			
+Manchild	Sabrina Carpenter		Manchild - Single			213																			
+Never Getting Laid	Sabrina Carpenter		Man’s Best Friend (Bonus Track Version)			208																			
+Tears	Sabrina Carpenter		Man’s Best Friend (Bonus Track Version)			160																			
+Rise (Leave Me Alone) [feat. Clark Anderson] [Airbase Damage Remake]	Safri Duo		3.5			593																			
+Soda Pop	Saja Boys, Andrew Choi, Neckwav, Danny Chung, KEVIN WOO, samUIL Lee & KPop Demon Hunters Cast		Soda Pop (from the Netflix film KPop Demon Hunters) - Single			150																			
+Your Idol	Saja Boys, Andrew Choi, Neckwav, Danny Chung, KEVIN WOO, samUIL Lee & KPop Demon Hunters Cast		Your Idol (from the Netflix film KPop Demon Hunters) - Single			191																			
+Here	Alessia Cara		Know-It-All (Deluxe)			199																			
+back to friends	sombr		back to friends - Single			199																			
+30 For 30 (with Kendrick Lamar)	SZA		SOS Deluxe: LANA			278																			
+Broken Clocks	SZA		Ctrl			231																			
+Snooze	SZA		SOS			201																			
+Stars	t.A.T.u.		200 KM/H In the Wrong Lane			247																			
+Sports car	Tate McRae		So Close To What			165																			
+All Too Well	Taylor Swift		Red			329																			
+august	Taylor Swift		folklore			261																			
+Cruel Summer	Taylor Swift		Lover			178																			
+exile (feat. Bon Iver)	Taylor Swift		folklore			285																			
+Lose Control	Teddy Swims		I've Tried Everything But Therapy (Part 1.5)			210																			
+About You	The 1975		Being Funny In A Foreign Language			326																			
+It Ends Tonight	The All-American Rejects		Move Along			244																			
+Dust to Dust	The Civil Wars		The Civil Wars			229																			
+Poison & Wine	The Civil Wars		Barton Hollow			219																			
+Iris	The Goo Goo Dolls		Dizzy Up the Girl			289																			
+Be Still	The Killers		Battle Born			275																			
+Caution	The Killers		Imploding the Mirage			269																			
+Exitlude	The Killers		Sam's Town			146																			
+Here With Me	The Killers		Battle Born			294																			
+Run for Cover	The Killers		Wonderful Wonderful (Deluxe)			222																			
+Runaways	The Killers		Battle Born			246																			
+The Calling	The Killers		Wonderful Wonderful (Deluxe)			241																			
+The Man	The Killers		Wonderful Wonderful (Deluxe)			250																			
+The Way It Was	The Killers		Direct Hits			232																			
+Yellow Ferrari (feat. Mystery Skulls)	The Toxic Avenger		Globe, Vol. 3			271																			
+Blinding Lights	The Weeknd		Blinding Lights - Single			201																			
+In Your Eyes (Remix) [feat. Kenny G]	The Weeknd		In Your Eyes (Remix) [feat. Kenny G] - Single			256																			
+I Say A Little Prayer	Tori Kelly & Pharrell Williams		Sing 2 (Original Motion Picture Soundtrack)			129																			
+Someone Else	Tourist		Everyday			247																			
+Strategy	TWICE		KPop Demon Hunters (Soundtrack from the Netflix Film)			168																			
+The Hardest Thing	Tyler Ward		Random Recordings			211																			
+Fragile Heart	Westlife		Coast to Coast (Expanded Edition)			179																			

@@ -37,10 +37,69 @@ def refresh_keywords():
     UNWANTED_EDIT_KEYWORDS = _KW_CONFIG.get("unwanted_edits", [])
 
 
-def parse_songs(file_path):
-    """Parse track titles from text file."""
+def parse_pls_file(file_path: str) -> list[str]:
+    """Parse track titles from PLS file TitleN tags sorted by numeric index."""
     if not os.path.exists(file_path):
         return []
+
+    entries: list[tuple[int, str]] = []
+    title_pattern = re.compile(r'^\s*Title(\d+)\s*=\s*(.+)$', re.IGNORECASE)
+
+    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+        for line in f:
+            match = title_pattern.match(line.strip())
+            if match:
+                idx = int(match.group(1))
+                title = match.group(2).strip()
+                if title:
+                    entries.append((idx, title))
+
+    # Sort by entry index N to preserve track order
+    entries.sort(key=lambda x: x[0])
+    return [title for _, title in entries]
+
+
+
+def parse_m3u_file(file_path: str) -> list[str]:
+    """Parse track titles from M3U / M3U8 #EXTINF tags or file lines."""
+    if not os.path.exists(file_path):
+        return []
+
+    songs = []
+    has_extinf = False
+    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+        for line in f:
+            line_s = line.strip()
+            if not line_s or line_s.startswith('#EXTM3U') or line_s.startswith('#PLAYLIST'):
+                continue
+            if line_s.startswith('#EXTINF:'):
+                parts = line_s.split(',', 1)
+                if len(parts) > 1 and parts[1].strip():
+                    songs.append(parts[1].strip())
+                    has_extinf = True
+            elif not line_s.startswith('#'):
+                if has_extinf:
+                    has_extinf = False
+                else:
+                    filename = os.path.basename(line_s)
+                    filename_no_ext = os.path.splitext(filename)[0]
+                    if filename_no_ext:
+                        songs.append(filename_no_ext)
+    return songs
+
+
+
+def parse_songs(file_path: str) -> list[str]:
+    """Parse track titles from .txt, .pls, or .m3u/.m3u8 playlist file."""
+    if not os.path.exists(file_path):
+        return []
+
+    ext = os.path.splitext(file_path)[1].lower()
+    if ext == '.pls':
+        return parse_pls_file(file_path)
+    elif ext in ('.m3u', '.m3u8'):
+        return parse_m3u_file(file_path)
+
     songs = []
     with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
         for line in f:
@@ -48,6 +107,21 @@ def parse_songs(file_path):
             if cleaned and not cleaned.startswith("==="):
                 songs.append(cleaned)
     return songs
+
+
+def convert_playlist_to_txt(file_path: str, output_path: str | None = None) -> str:
+    """Convert a .pls or .m3u/.m3u8 file to a standard .txt source text file."""
+    songs = parse_songs(file_path)
+    if output_path is None:
+        base_name = os.path.splitext(file_path)[0]
+        output_path = f"{base_name}.txt"
+
+    with open(output_path, 'w', encoding='utf-8') as f:
+        for song in songs:
+            f.write(f"{song}\n")
+
+    return output_path
+
 
 
 def clean_string(text):
@@ -300,36 +374,33 @@ def generate_search_queries(song_line):
 
 
 def scan_playlist_files():
-    """Scan playlist text files in source_text_files or fallback directory."""
+    """Scan playlist files (.txt, .pls, .m3u, .m3u8) in source_text_files or fallback directory."""
     ensure_all_folders()
 
-    txt_candidates = []
+    playlist_candidates = []
     seen_names = set()
+    valid_exts = ('.txt', '.pls', '.m3u', '.m3u8')
 
     # Priority 1: source_text_files
     if os.path.exists(SOURCE_TEXT_FILES_DIR):
         for f in sorted(os.listdir(SOURCE_TEXT_FILES_DIR)):
-            if f.lower().endswith('.txt') and not f.lower().endswith('_report.txt'):
-                txt_candidates.append(os.path.join(SOURCE_TEXT_FILES_DIR, f))
+            if f.lower().endswith(valid_exts) and not f.lower().endswith('_report.txt'):
+                playlist_candidates.append(os.path.join(SOURCE_TEXT_FILES_DIR, f))
                 seen_names.add(f)
 
     # Priority 2: playlist_sources fallback
     if os.path.exists(PLAYLIST_SOURCES_DIR):
         for f in sorted(os.listdir(PLAYLIST_SOURCES_DIR)):
-            if f.lower().endswith('.txt') and not f.lower().endswith('_report.txt') and f not in seen_names:
+            if f.lower().endswith(valid_exts) and not f.lower().endswith('_report.txt') and f not in seen_names:
                 fpath = os.path.join(PLAYLIST_SOURCES_DIR, f)
                 if os.path.isfile(fpath):
-                    txt_candidates.append(fpath)
+                    playlist_candidates.append(fpath)
 
     file_info_list = []
-    for full_path in txt_candidates:
+    for full_path in playlist_candidates:
         filename = os.path.basename(full_path)
-        song_count = 0
-        with open(full_path, 'r', encoding='utf-8', errors='ignore') as f:
-            for line in f:
-                c = line.strip()
-                if c and not c.startswith("==="):
-                    song_count += 1
+        songs = parse_songs(full_path)
+        song_count = len(songs)
         size_bytes = os.path.getsize(full_path)
         file_info_list.append({
             'filename': filename,
@@ -338,3 +409,4 @@ def scan_playlist_files():
             'size': size_bytes
         })
     return file_info_list
+

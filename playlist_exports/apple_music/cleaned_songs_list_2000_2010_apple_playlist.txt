@@ -1,0 +1,193 @@
+Name	Artist	Composer	Album	Genre	Size	Time	Disc Number	Disc Count	Track Number	Track Count	Year	Date Modified	Date Added	Bit Rate	Sample Rate	Volume Adjustment	Kind	Equalizer	Comments	Play Count	Last Played	Skip Count	Last Skipped	My Rating	Location
+Haruskah Ku Mati	ADA Band		Romantic Rhapsody			283																			
+Karena Wanita (Ingin Dimengerti)	ADA Band		Romantic Rhapsody			276																			
+Manusia Bodoh	ADA Band		Heaven Of Love			257																			
+Masih Sahabatku Kekasihku	ADA Band		Metamorphosis			294																			
+Yang Terbaik Bagimu (Jangan Lupakan Ayah) [feat. Gita Gutawa]	ADA Band		Heaven Of Love			252																			
+Bukan Cinta Biasa	Afgan		The One (Almost full version)			251																			
+Cinta 2 Hati	Afgan		The One (Almost full version)			266																			
+Sadis (Dekade Version)	Afgan		DEKADE			228																			
+Terima kasih Cinta (Beat version)	Afgan		Bukan Cinta Biasa (Original Motion Picture Soundtrack)			190																			
+Bilang Saja	Agnes Monica		Agnes Is My Name			235																			
+Bukan Milikmu Lagi	Agnes Monica		Agnes Is My Name			218																			
+Jera	Agnes Monica		Agnes Is My Name			306																			
+Pernikahan Dini	Agnes Monica		Love Theme			307																			
+Tanpa Kekasihku	Agnes Monica		Whaddup A'..?!			333																			
+Teruskanlah	Agnes Monica		Agnes Is My Name			275																			
+Arti Cinta	Ari Lasso		Yang Terbaik			249																			
+Hampa	Ari Lasso		Yang Terbaik			297																			
+Mengejar Matahari	Ari Lasso		Kulihat, Kudengar, Kurasa			198																			
+Perbedaan	Ari Lasso		Yang Terbaik			311																			
+Rahasia Perempuan	Ari Lasso		Keseimbangan			210																			
+Aku dan Dirimu (feat. Bunga Citra Lestari) [Remastered 2024]	Ari Lasso		Ari Lasso (Remastered 2024)			266																			
+Buka Hatimu	Armada		Hal Terbesar			274																			
+Mau Dibawa Kemana	Armada		Hal Terbesar			239																			
+Jadikan Aku Yang Kedua	Astrid		Jadikan Aku Yang Ke 2			251																			
+Tentang Rasa	Astrid		Lihat Aku Sekarang			251																			
+Arti Hadirmu	Audy		Audy: 18			194																			
+Dibalas Dengan Dusta	Audy		20-02			264																			
+Menangis Semalam	Audy		Audy: 18			265																			
+Cinta Pertama (Sunny)	Bunga Citra Lestari		Cinta Pertama			262																			
+Kecewa	Bunga Citra Lestari		Tentang Kamu			229																			
+Pernah Muda	Bunga Citra Lestari		Tentang Kamu			203																			
+Cinta Ini Membunuhku	D’MASIV		Perubahan			243																			
+Diam Tanpa Kata	D’MASIV		Perubahan			236																			
+Jangan Menyerah	D’MASIV		Hidup Lebih Indah			258																			
+Merindukanmu	D’MASIV		Perubahan			265																			
+Sudahi Perih Ini	D’MASIV		Perjalanan			251																			
+Arjuna	Dewa 19		Cintailah Cinta			313																			
+Laskar Cinta (Chapter One)	Dewa 19		The 2000's Greatest			244																			
+Pupus	Dewa 19		Cintailah Cinta			305																			
+Risalah Hati	Dewa 19		Bintang Lima			292																			
+Roman Picisan	Dewa 19		Bintang Lima			242																			
+Sedang Ingin Bercinta	Dewa 19		The 2000's Greatest			240																			
+Separuh Nafas	Dewa 19		Bintang Lima			300																			
+Siapa Yang Pantas	Domino		Domino			211																			
+Bersama Bintang	Drive		Esok Lebih Baik			286																			
+Melepasmu	Drive		Kita Untuk Selamanya			262																			
+Tak Terbalas	Drive		Esok Lebih Baik			218																			
+Cinta Tak Bersyarat	Element		Resonansi			221																			
+Rahasia Hati	Element		Save the Best For Last			223																			
+Masih Ada	Ello		Realistis Idealis			238																			
+Pergi Untuk Kembali	Ello		Ello			267																			
+My Facebook	GIGI		GIGI			281																			
+Jomblo	Gigi		Andai			83																			
+Nakal	GIGI		Peace, Love and Respect			232																			
+Ya.. Ya.. Ya..	GIGI		GIGI			240																			
+Bukan Permainan	Gita Gutawa		Gita Gutawa			255																			
+Kembang Perawan	Gita Gutawa		Gita Gutawa			193																			
+Lelaki Sempurna	Gita Gutawa		Balada Shalawat			252																			
+Akhir Cerita Cinta (Ost. Cinta Silver - Re-arrange Version)	Glenn Fredly		Private Collection			283																			
+Januari	Glenn Fredly		Indonesian Love Song			222																			
+Kisah Romantis	Glenn Fredly		Warna With Friends			260																			
+Medley: Sedih Tak Berujung / Akhir Cerita Cinta (Together Whatever Sessions Live)	Glenn Fredly		Kacau Galau (Together Whatever Sessions Live)			605																			
+Itu Saja (feat. Mutia Ayu)	Glenn Fredly		Itu Saja (feat. Mutia Ayu) - Single			249																			
+Ular Berbisa	HELLO		Say Hello			214																			
+Ada Yang Hilang	Ipang Lazuardi		Hits Ipang Lazuardi			230																			
+Sahabat Kecil	Ipang		Laskar Pelangi			245																			
+Ceria	J-Rocks		Topeng Sahabat			233																			
+Fallin' In Love	J-Rocks		The Best of Top			254																			
+Kau Curi Lagi	J-Rocks		Spirit			292																			
+Lepaskan Diriku	J-Rocks		Topeng Sahabat			236																			
+Bukan Rayuan Gombal	Judika		Judika Mencari Cinta			282																			
+Aku, Dirimu, Dirinya	Kahitna		Cerita Cinta 25 Tahun Kahitna			195																			
+Cinta Sendiri	Kahitna		Cerita Cinta 25 Tahun Kahitna			253																			
+Mantan Terindah	Kahitna		Lebih Dari Sekedar Cantik			223																			
+Doy	Kangen Band		Bintang 14 Hari			204																			
+Selingkuh	Kangen Band		Tentang Bintang			272																			
+Tentang Bintang	Kangen Band		Tentang Bintang			326																			
+Terbang Bersamaku	Kangen Band		Pujaan Hati			240																			
+Aku Harus Jujur	Kerispatih		Semua Tentang Cinta			266																			
+Demi Cinta	Kerispatih		Tak Lekang Oleh Waktu			282																			
+Kejujuran Hati	Kerispatih		Kejujuran Hati			360																			
+Mengenangmu	Kerispatih		Kenyataan Perasaan			277																			
+Tapi Bukan Aku	Kerispatih		Kenyataan Perasaan			270																			
+Beraksi	Kotak		Kotak Kedua			205																			
+Cinta Jangan Pergi (CJP)	Kotak		Terbaik			191																			
+Masih Cinta	Kotak		Kotak Kedua			245																			
+Pelan Pelan Saja	Kotak		Energi			239																			
+Tinggalkan Saja	Kotak		Terbaik			233																			
+Permintaan Hati	Letto		Don't Make Me Sad			310																			
+Ruang Rindu	Letto		Truth, Cry and Lie			212																			
+Sandaran Hati	Letto		Truth, Cry and Lie			242																			
+Sebelum Cahaya	Letto		Don't Make Me Sad			240																			
+Dia	MALIQ & D'Essentials		Free Your Mind (Deluxe)			263																			
+Pilihanku	MALIQ & D'Essentials		Mata Hati Telinga - EP			206																			
+Untitled	Rahmania Astrini & MALIQ & D'Essentials		Untitled - Single			246																			
+Firasat	Marcell		Marcell			247																			
+Peri Cintaku	Marcell		And the Story Continues...			257																			
+Semusim	Marcell		Marcell			301																			
+Ketahuan (Feel Koplo Remix)	Matta		Ketahuan (Feel Koplo Remix) - Single			208																			
+Makhluk Tuhan Paling Sexy	Mulan Jameela		Mulan Jameela			266																			
+Akhirnya Ku Menemukanmu	Naff		Isyarat Hati			306																			
+Bila Nanti Kau Milikku (Live)	Naff		Senandung Hati Dan Jiwa			296																			
+Kau Masih Kekasihku	Naff		Isyarat Hati			285																			
+Terendap Laraku	Naff		NaFF			309																			
+Biarlah	Nidji		Top Up			238																			
+Disco Lazy Time	Nidji		Breakthru			255																			
+Hapus Aku	Nidji		Breakthru			252																			
+Laskar Pelangi	Nidji		Laskar Pelangi (Single - OST Laskar Pelangi)			232																			
+Sang Mantan	Nidji		Let's Play			234																			
+Sudah	Nidji		Breakthru			264																			
+Kasih Tak Sampai	Padi		Sesuatu Yang Tertunda			293																			
+Menanti Sebuah Jawaban	Padi		Padi			275																			
+Sang Penghibur	Padi		Tak Hanya Diam			291																			
+Sesuatu Yang Indah	Padi		Sesuatu Yang Tertunda			349																			
+Sobat	Padi		Lain Dunia			324																			
+Ada Apa Denganmu	peterpan		Bintang Di Surga			280																			
+Bintang Di Surga	peterpan		Bintang Di Surga			300																			
+Ku Katakan Dengan Indah	peterpan		Sebuah Nama, Sebuah Cerita			334																			
+Menghapus Jejakmu	peterpan		Sebuah Nama, Sebuah Cerita			184																			
+Mimpi Yang Sempurna	peterpan		Sebuah Nama, Sebuah Cerita			216																			
+Mungkin Nanti	peterpan		Sebuah Nama, Sebuah Cerita			268																			
+Tak Bisakah	peterpan		Sebuah Nama, Sebuah Cerita			214																			
+Walau Habis Terang	peterpan		Hits Terbaik NOAH - Peterpan - EP			215																			
+Yang Terdalam	peterpan		Taman langit			197																			
+Kekasih Yang Tak Dianggap	Pinkan Mambo		Wanita Terindah			283																			
+Aku Ada Karena Kau Ada	Radja		Aku Ada Karena Kau Ada			295																			
+BBC (Benci Bilang Cinta)	Radja		Aku Ada Karena Kau Ada			281																			
+Jujur	Radja		Langkah Baru			292																			
+Tulus	Radja		Langkah Baru			263																			
+Jadi Gila	RAN		Friday			261																			
+Pandangan Pertama	RAN		RAN for Your Life			300																			
+Selamat Pagi	RAN		RAN for Your Life			234																			
+Aku Baik-Baik Saja	Ratu		Bersama			298																			
+Teman Tapi Mesra	Ratu		No. Satu			264																			
+Hanya Ingin Kau Tahu	Repvblik		Punya Arti			238																			
+Jika Aku Mati	Repvblik		Punya Arti			270																			
+Bukan Untukku	Rio Febrian		Sakit Hati			259																			
+Jenuh	Rio Febrian		Rio F3brian			306																			
+Ayat-Ayat Cinta	Rossa		Platinum Collection Rossa			226																			
+Hati Yang Kau Sakiti	Rossa		Rossa			243																			
+Kini	Rossa		Kini (Repackaged)			187																			
+Pudar	Rossa		Kembali			180																			
+Tegar	Rossa		Yang Terpilih			221																			
+Akhir Rasa Ini	SAMSONS		Naluri Lelaki (Special Edition)			294																			
+Di Ujung Jalan	SAMSONS		Perihal Besar			233																			
+Kenangan Terindah	SAMSONS		tak segampang itu			247																			
+Naluri Lelaki	SAMSONS		Naluri Lelaki (Special Edition)			223																			
+Tak Pernah Padam	Sandhy Sondoro		Find the Way			241																			
+Jaga Slalu Hatimu	Seventeen		5ang Juara			288																			
+Selalu Mengalah	Seventeen		Lelaki Hebat			228																			
+Untuk Mencintaimu	Seventeen		Lelaki Hebat			209																			
+Itu Aku	Sheila On 7		Pejantan Tangguh			278																			
+Melompat Lebih Tinggi	Sheila On 7		OST. 30 Hari Mencari Cinta			198																			
+Pejantan Tangguh	Sheila On 7		Pejantan Tangguh			207																			
+Pria Kesepian	Sheila On 7		07 Des			242																			
+Radio	Sheila On 7		507			209																			
+Sahabat Sejati	Sheila On 7		Kisah Klasik Untuk Masa Depan			224																			
+Sephia	Sheila On 7		Anugerah Terindah			291																			
+Cinta Pertama Dan Terakhir	Sherina Munaf		Gemini			275																			
+Geregetan	Sherina Munaf		Gemini			240																			
+Pergilah Kau	Sherina Munaf		Gemini			233																			
+Cari Pacar Lagi	ST12		P.U.S.P.A.			215																			
+Isabella	ST12		P.U.S.P.A.			260																			
+Jangan Pernah Berubah	ST12		P.U.S.P.A.			243																			
+Saat Terakhir	ST12		P.U.S.P.A.			285																			
+OK	T2		OK!!			256																			
+I Will Fly	Ten2Five		I Will Fly			226																			
+You	T-Five & Ten2Five		You - Single			198																			
+Awal Yang Indah	Tere		Awal Yang Indah			260																			
+Penjagal Hati	The Changcuters		Binauralis			185																			
+Racun Dunia	The Changcuters		Mencoba Sukses Kembali			274																			
+Cinta	The Virgin		Yes I Am			165																			
+Bahasa Kalbu	Titi DJ		Bahasa Kalbu - Single			271																			
+Sang Dewi	Titi DJ		Menyanyikan Kembali - EP			250																			
+Cinta Dalam Hati	Ungu		Untukmu Selamanya			283																			
+Demi Waktu	Ungu		Timeless			307																			
+Hampa Hatiku	Ungu		Penguasa Hati			228																			
+Kekasih Gelapku	Ungu		Untukmu Selamanya			284																			
+Seperti Yang Dulu	Ungu		Melayang			262																			
+Tercipta Untukku	Ungu		Melayang			265																			
+Untukmu Selamanya	Ungu		Untukmu Selamanya			294																			
+Antara Ada dan Tiada	Utopia		Utopia			242																			
+Hujan	Utopia		Indah			235																			
+Status Palsu	VIDI		Pelangi Di Malam Hari - EP			248																			
+Baik Baik Sayang	Wali		Cari Jodoh			251																			
+Cari Jodoh	Wali		Cari Jodoh			250																			
+Dik	Wali		Orang Bilang			273																			
+Yank	Wali		Cari Jodoh			274																			
+Bunga Jiwaku	Yovie & Nuno		The Special One			214																			
+Dia Milikku	Yovie & Nuno		The Special One			211																			
+Janji Suci	Yovie & Nuno		The Special One			198																			
+Menjaga Hati	Yovie & Nuno		The Special One			237																			
