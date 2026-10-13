@@ -1,0 +1,17 @@
+spotipy~=2.23.0
+mutagen~=1.47.0
+requests~=2.31.0
+rich~=13.7.0
+python-dotenv~=1.0.0
+librosa~=0.10.0
+soundfile~=0.12.0
+
+[dev]
+pytest~=8.0.0
+pytest-cov~=5.0.0
+black~=24.0
+flake8~=7.0
+isort~=5.13
+mypy~=1.8
+pre-commit~=3.6
+types-requests
