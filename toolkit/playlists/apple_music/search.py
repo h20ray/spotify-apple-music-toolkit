@@ -16,10 +16,11 @@ from toolkit.core.constants import (
     RATE_LIMIT_DELAY,
     TIMEOUT_API_SHORT,
 )
-from toolkit.playlists.apple_music.cloud import get_apple_developer_token
+from toolkit.playlists.apple_music.cloud import catalog_headers, get_apple_developer_token, get_user_storefront
 from toolkit.playlists.apple_music.scoring import score_track_candidate
 from toolkit.playlists.apple_music.state import (
     CACHE_FILE,
+    ITUNES_BLOCKED,
     LEGACY_CACHE_FILE,
     SEARCH_CACHE,
     console,
@@ -100,8 +101,11 @@ def search_apple_music_track(song_line, is_trim_retry=False):
 
     # Step 1: iTunes Public Search API with Early-Exit and 429 Backoff
     url_itunes = "https://itunes.apple.com/search"
+    storefront = get_user_storefront()
     for search_term in queries:
-        params_itunes = {"term": search_term, "media": "music", "entity": "song", "limit": 10}
+        if ITUNES_BLOCKED[0]:
+            break
+        params_itunes = {"term": search_term, "media": "music", "entity": "song", "limit": 10, "country": storefront}
         for attempt in range(MAX_RETRY_ATTEMPTS):
             try:
                 time.sleep(RATE_LIMIT_DELAY)
@@ -134,6 +138,11 @@ def search_apple_music_track(song_line, is_trim_retry=False):
                             SEARCH_CACHE[song_line] = best_candidate
                             return best_candidate
                     break
+                if resp.status_code == 403:
+                    # iTunes answers 403 once it rate-limits an IP, and stays blocked for a long time.
+                    logger.warning("iTunes Search is refusing requests (403); using the Apple Music catalog only.")
+                    ITUNES_BLOCKED[0] = True
+                    break
                 if resp.status_code == 429:
                     time.sleep(1.5 * (attempt + 1))
                 else:
@@ -149,15 +158,11 @@ def search_apple_music_track(song_line, is_trim_retry=False):
     # Step 2: Official Apple Music Catalog Web API
     dev_token = get_apple_developer_token()
     if dev_token:
-        headers_amp = {
-            "Authorization": f"Bearer {dev_token}",
-            "Origin": "https://music.apple.com",
-            "Referer": "https://music.apple.com/"
-        }
-        url_amp = "https://amp-api.music.apple.com/v1/catalog/us/search"
+        headers_amp = catalog_headers(dev_token)
+        url_amp = f"https://amp-api.music.apple.com/v1/catalog/{storefront}/search"
         for search_term in queries:
             params_amp = {"term": search_term, "types": "songs", "limit": 10}
-            for attempt in range(3):
+            for attempt in range(MAX_RETRY_ATTEMPTS):
                 try:
                     time.sleep(RATE_LIMIT_DELAY)
                     resp = http_get(url_amp, params=params_amp, headers=headers_amp, timeout=TIMEOUT_API_SHORT)
@@ -195,7 +200,7 @@ def search_apple_music_track(song_line, is_trim_retry=False):
                                 return best_candidate
                         break
                     if resp.status_code == 429:
-                        time.sleep(1.5 * (attempt + 1))
+                        time.sleep(5 * (attempt + 1))  # catalog 429s clear slowly; short retries just extend the block
                     else:
                         break
                 except (OSError, ValueError, KeyError) as e:
