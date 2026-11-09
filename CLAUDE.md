@@ -1,3 +1,46 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project
+
+Interactive Rich-based CLI (Python 3.10+) for tagging a local audio library (title/artist/album/genre, BPM, mood, cover art, synced `.lrc` lyrics) and building Spotify / Apple Music playlists from plain-text song lists (`Title - Artist`, one per line). Entry point: `python main.py` → `toolkit.ui.dashboard.main()`. See `ARCHITECTURE.md` and `docs/` for per-feature guides.
+
+## Commands
+
+```bash
+pip install -r requirements.txt && pip install -e ".[dev]"   # runtime + dev tools (pytest, black, isort, flake8, mypy)
+python main.py                                               # interactive menu
+
+pytest                                                       # all tests (config in pyproject: testpaths=tests, -q)
+pytest tests/test_scoring.py::test_score_album_studio                 # single test
+pytest --cov=toolkit
+
+flake8 toolkit --max-line-length=120 --extend-ignore=E203,W503   # what CI lint runs (CI fails on this)
+mypy toolkit                                                      # CI runs it but ignores failures
+black . && isort .                                                # line length 120
+```
+
+CI (`.github/workflows/`) runs pytest on Python 3.10, 3.11 and 3.12 — avoid syntax newer than 3.10 (e.g. nested same-quote f-strings broke CI before).
+
+## Architecture
+
+- `toolkit/core` — `config.py` defines every project path (all derived from repo root `BASE_DIR`), loads `.env` at import time, and reads `config/keywords.json` (merged over `DEFAULT_KEYWORDS`, auto-created if missing). `network.py` provides a shared `requests.Session` with proxy (`HTTP_PROXY`/`HTTPS_PROXY`) and IPv4 fallback — use `http_get`/`http_post` rather than raw `requests`. Timeouts, worker counts, user agents and scoring magic numbers live in `constants.py`.
+- `toolkit/audio` — `metadata.read_audio_metadata` is the single reader for MP3/M4A/FLAC tags; `tagger/` (Spotify metadata fetch → librosa BPM → mood → mutagen writer), `artwork/` (sources → resize → embed), `lyrics.py` (LRC download next to audio files).
+- `toolkit/playlists` — `parser` cleans/sanitizes song lines; `spotify.py` searches + creates via spotipy; `apple_music/` searches through a tiered fallback (local cache → iTunes Search API → Apple catalog `amp-api` → Deezer) scored by `scoring.score_track_candidate` using the keyword lists to reject karaoke/covers/remixes/live versions unless the line asks for them; `cloud.py` creates the library playlist using `APPLE_MUSIC_USER_TOKEN` plus a developer token scraped from music.apple.com JS (or `APPLE_MUSIC_DEVELOPER_TOKEN`). `exporter` writes TSV/M3U8/XML into `playlist_exports/`.
+- `toolkit/ui/dashboard.py` — the only place that orchestrates menus and may call `sys.exit`; library modules must log/raise instead.
+
+Conventions that span modules:
+- Packages split into submodules re-export their public API from `__init__.py` (`toolkit.audio.tagger`, `toolkit.audio.artwork`, `toolkit.playlists.apple_music`); keep those exports stable. Root-level scripts (`audio_tagger.py`, `network_utils.py`, `playlist_creator.py`, etc.) are thin backward-compat wrappers over `toolkit`.
+- Apple Music module-level mutable state (search cache, cached bearer token, rate-limit lock) lives in `apple_music/state.py`, held in one-element lists so submodules can mutate it.
+- Tagger, artwork and lyrics run in `ThreadPoolExecutor`; progress/status updates must happen under `STATUS_LOCK`.
+- Caches live in `.cache/` (`apple_music_search_cache.json`, `spotify_tag_cache.json`, Spotify token).
+- User output goes through a Rich `console`; warnings/errors through `toolkit.core.logging` (`get_logger`). Prefer specific exceptions over bare `except Exception`.
+- Tests that touch paths use the `keywords_file` fixture in `tests/conftest.py`, which monkeypatches every path constant in `toolkit.core.config` to `tmp_path` — extend it if you add a new path constant.
+- `playlist_sources/` and `playlist_exports/` contain the user's real data and are committed; don't regenerate or clean them unless asked.
+
+---
+
 <!-- rtk-instructions v2 -->
 # RTK (Rust Token Killer) - Token-Optimized Commands
 
