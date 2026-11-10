@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import os
+import re
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Callable, Optional
@@ -86,6 +87,23 @@ def shared_album_names(entries: list[dict[str, Any]]) -> set[str]:
     return {album for album, artists in artists_by_album.items() if len(artists) >= 2}
 
 
+_SINGLE_EP_TAG_RE = re.compile(r"(-\s*(single|ep)|\bEP)\s*$", re.IGNORECASE)
+
+
+def looks_suspicious(album: str, artist: str, shared: set[str]) -> bool:
+    """True when an album tag is probably not the song's original album.
+
+    No album, a compilation/playlist name, an album shared by several artists, or a single/EP tag (the song may
+    also be on a studio album).
+    """
+    return (
+        not album
+        or normalize(album) in shared
+        or is_compilation_name(album, artist)
+        or bool(_SINGLE_EP_TAG_RE.search(album))
+    )
+
+
 def decide(entry: dict[str, Any], resolved: Optional[dict[str, Any]], shared: set[str]) -> dict[str, Any]:
     """Build one report row for a file from its current tags and the resolver result."""
     row = {
@@ -125,7 +143,7 @@ def decide(entry: dict[str, Any], resolved: Optional[dict[str, Any]], shared: se
         row["art_url"] = ""
         return row
 
-    suspicious = (not current) or normalize(current) in shared or is_compilation_name(current, entry["artist"])
+    suspicious = looks_suspicious(current, entry["artist"], shared)
     low_confidence = bool(resolved.get("uncertain"))
     row["status"] = STATUS_CHANGE if suspicious and not low_confidence else STATUS_REVIEW
     return row
@@ -160,11 +178,7 @@ def plan_folder(
     total = len(entries)
     for index, entry in enumerate(entries, 1):
         resolved = None
-        if (
-            only_suspicious
-            and entry["album"]
-            and not (normalize(entry["album"]) in shared or is_compilation_name(entry["album"], entry["artist"]))
-        ):
+        if only_suspicious and not looks_suspicious(entry["album"], entry["artist"], shared):
             row = decide(entry, None, shared)
             row.update(status=STATUS_OK, note="skipped lookup: album looks fine")
             rows.append(row)
