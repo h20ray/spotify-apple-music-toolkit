@@ -348,3 +348,16 @@ def test_valid_track_info_ignores_box_set_disc_numbers():
 
     assert valid_track_info(3, 15, 3, 6) == {"track": 3, "track_total": 15}
     assert valid_track_info(1, 12, 2, 2) == {"track": 1, "track_total": 12, "disc": 2, "disc_total": 2}
+
+
+def test_single_ep_album_tags_are_suspicious_and_become_change():
+    from toolkit.audio.album_fixer import looks_suspicious
+
+    for name in ("Don't Stop the Music - Single", "Overtime EP", "Collage - EP"):
+        assert looks_suspicious(name, "Rihanna", set()), name
+    assert not looks_suspicious("Good Girl Gone Bad", "Rihanna", set())
+    resolved = {"source": "iTunes", "score": 110, "album": "Good Girl Gone Bad", "year": "2007", "art_url": "u"}
+    entry = _entry("Don't Stop the Music - Single", artist="Rihanna", title="Don't Stop the Music")
+    assert decide(entry, resolved, set())["status"] == STATUS_CHANGE
+    same = {**resolved, "album": "Don't Stop the Music - Single"}
+    assert decide(entry, same, set())["status"] == STATUS_OK
