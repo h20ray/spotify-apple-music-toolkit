@@ -10,7 +10,7 @@ import time
 import unicodedata
 from typing import Any, Callable, Optional
 
-from toolkit.core import CACHE_DIR, http_get
+from toolkit.core import CACHE_DIR, http_get, http_post
 from toolkit.core.logging import get_logger
 from toolkit.playlists.parser import COMPILATION_KEYWORDS
 
@@ -35,7 +35,7 @@ _COMPILATION_RE = re.compile(
     r"original cast|broadway|sing along|tribute|\b\d{2,4}s\b|bonus tracks|\(the album\)|bangers|throwback|"
     r"\bsingles\b|remix album|anthology|the very best|top \d+|now that|"
     r"m[uú]sicas|canciones|[eé]xitos|hinos|essenciais|tesoros|sucessos|cl[aá]ssicos|"
-    r"[a-zÀ-ɏ]{3,} (19|20)\d{2}$",
+    r"[a-zÀ-ɏ]{3,} (19|20)\d{2}( ?/ ?\d+)?$",
     re.IGNORECASE,
 )
 _BEST_OF_RE = re.compile(
@@ -210,6 +210,8 @@ def choose_musicbrainz(recordings: list[dict[str, Any]], title: str = "") -> Opt
             if rel.get("status") != "Official":
                 continue
             name = rel.get("title", "")
+            if is_compilation_name(name):
+                continue
             candidates.append(
                 (bool(_REISSUE_RE.search(name)), rel.get("date") or "9999", name, group.get("id", ""), rel)
             )
@@ -313,6 +315,82 @@ def search_musicbrainz(artist: str, title: str) -> Optional[dict[str, Any]]:
     return None
 
 
+GENIUS_API = "https://api.genius.com"
+_genius_token: list[str] = []  # bearer token, fetched once per run
+
+
+def _genius_headers() -> Optional[dict[str, str]]:
+    """Bearer header from GENIUS_CLIENT_ID / GENIUS_CLIENT_SECRET (.env), or None when not configured."""
+    client_id, client_secret = os.getenv("GENIUS_CLIENT_ID"), os.getenv("GENIUS_CLIENT_SECRET")
+    if not client_id or not client_secret:
+        return None
+    if not _genius_token:
+        try:
+            res = http_post(
+                f"{GENIUS_API}/oauth/token",
+                json={"client_id": client_id, "client_secret": client_secret, "grant_type": "client_credentials"},
+            )
+            token = res.json().get("access_token") if res.status_code == 200 else None
+        except (OSError, ValueError) as e:
+            logger.warning(f"Genius token request failed: {e}")
+            return None
+        if not token:
+            logger.warning("Genius rejected the client credentials; check GENIUS_CLIENT_ID/GENIUS_CLIENT_SECRET")
+            return None
+        _genius_token.append(token)
+    return {"Authorization": f"Bearer {_genius_token[0]}"}
+
+
+def _genius_year(info: dict[str, Any]) -> str:
+    """Release year from a Genius song: release_date, else the display date, else the album's date."""
+    for value in (info.get("release_date"), info.get("release_date_for_display")):
+        match = re.search(r"(19|20)\d{2}", str(value or ""))
+        if match:
+            return match.group(0)
+    components = (info.get("album") or {}).get("release_date_components") or {}
+    return str(components.get("year") or "")
+
+
+def search_genius(artist: str, title: str) -> Optional[dict[str, Any]]:
+    """Album Genius lists for the song (first matching search hit that has an album)."""
+    headers = _genius_headers()
+    if not headers:
+        return None
+    artist_key, wanted = normalize(primary_artist(artist)), base_title(title)
+    try:
+        _throttle("genius", 0.5)
+        found = http_get(f"{GENIUS_API}/search", params={"q": f"{primary_artist(artist)} {title}"}, headers=headers)
+        hits = found.json().get("response", {}).get("hits", []) if found.status_code == 200 else []
+        for hit in hits:
+            song = hit.get("result", {})
+            if artist_key not in normalize(song.get("primary_artist", {}).get("name", "")):
+                continue
+            if base_title(song.get("title", "")) != wanted:
+                continue
+            if not wants_version(title) and wants_version(song.get("title", "")):
+                continue
+            _throttle("genius", 0.5)
+            detail = http_get(f"{GENIUS_API}/songs/{song['id']}", headers=headers)
+            info = detail.json().get("response", {}).get("song", {}) if detail.status_code == 200 else {}
+            album = info.get("album") or {}
+            if not album.get("name"):
+                continue
+            result = {
+                "source": "Genius",
+                "score": None,
+                "album": album["name"],
+                "year": _genius_year(info),
+                "art_url": album.get("cover_art_url") or "",
+                "why": [],
+            }
+            if is_compilation_name(album["name"], artist):
+                result["uncertain"] = True
+            return result
+    except (OSError, ValueError, KeyError) as e:
+        logger.warning(f"Genius lookup failed for '{artist} - {title}': {e}")
+    return None
+
+
 def _load_cache() -> None:
     global _cache_loaded, _cache
     if _cache_loaded:
@@ -357,7 +435,14 @@ def resolve_album(artist: str, title: str, year: str = "") -> Optional[dict[str,
             reason = f"iTunes score {itunes['score']}" if itunes else "not found on iTunes"
         _say(f"{reason}, trying MusicBrainz")
         mb = search_musicbrainz(artist, title)
-        if mb:
+        genius = None
+        if mb is None or mb.get("uncertain"):
+            _say("trying Genius")
+            genius = search_genius(artist, title)
+        if genius:
+            genius["note"] = f"{reason}, MusicBrainz {'unsure' if mb else 'found nothing'}, used Genius"
+            result = genius
+        elif mb:
             note = f"{reason}, used MusicBrainz"
             mb["note"] = f"{note}; {mb['note']}" if mb.get("note") else note
             result = mb

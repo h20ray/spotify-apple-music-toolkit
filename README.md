@@ -41,6 +41,7 @@ pip3 install -r requirements.txt
 |------|----------|
 | Spotify playlists / tagging | `SPOTIPY_CLIENT_ID`, `SPOTIPY_CLIENT_SECRET` |
 | Apple Music cloud playlists | `APPLE_MUSIC_USER_TOKEN` |
+| Album & Cover Fixer, Genius fallback (optional) | `GENIUS_CLIENT_ID`, `GENIUS_CLIENT_SECRET` |
 | Proxy (optional) | `HTTP_PROXY`, `HTTPS_PROXY` |
 
 Spotify keys: [Developer Dashboard](https://developer.spotify.com/dashboard) → create app → redirect `https://127.0.0.1:8888/callback`.
