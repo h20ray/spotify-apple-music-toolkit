@@ -1,5 +1,7 @@
 """Tests for original-album resolution (iTunes + MusicBrainz) and the album fixer decision logic."""
 
+import os
+
 from toolkit.audio.album_fixer import (
     STATUS_CHANGE,
     STATUS_NOT_FOUND,
@@ -361,3 +363,48 @@ def test_single_ep_album_tags_are_suspicious_and_become_change():
     assert decide(entry, resolved, set())["status"] == STATUS_CHANGE
     same = {**resolved, "album": "Don't Stop the Music - Single"}
     assert decide(entry, same, set())["status"] == STATUS_OK
+
+
+def test_offline_plan_uses_cache_only(tmp_path, monkeypatch):
+    import toolkit.audio.album_fixer as fixer
+    import toolkit.audio.album_resolver as r
+
+    entries = {"a.m4a": ("Green Day", "Basket Case", "Rock from the 90s"), "b.m4a": ("Adele", "Hello", "Hits")}
+    for name in entries:
+        (tmp_path / name).write_bytes(b"x")
+
+    class Meta:
+        def __init__(self, artist, title, album):
+            self.artist, self.title, self.album, self.year = artist, title, album, "2000"
+
+    monkeypatch.setattr(fixer, "read_audio_metadata", lambda path: Meta(*entries[os.path.basename(path)]))
+    monkeypatch.setattr(
+        r,
+        "_cache",
+        {
+            r_key("Green Day", "Basket Case", "2000"): {
+                "source": "iTunes",
+                "score": 110,
+                "album": "Dookie",
+                "year": "1994",
+                "art_url": "u",
+                "why": [],
+            }
+        },
+    )
+    monkeypatch.setattr(r, "_cache_loaded", True)
+
+    def no_network(*a, **k):
+        raise AssertionError("offline mode must not use the network")
+
+    monkeypatch.setattr(r, "http_get", no_network)
+    monkeypatch.setattr(fixer, "save_cache", lambda: None)
+    rows = {os.path.basename(x["file"]): x for x in fixer.plan_folder(str(tmp_path), offline=True)}
+    assert rows["a.m4a"]["status"] == STATUS_CHANGE and rows["a.m4a"]["new_album"] == "Dookie"
+    assert rows["b.m4a"]["status"] == STATUS_NOT_FOUND and "offline" in rows["b.m4a"]["note"]
+
+
+def r_key(artist, title, year):
+    from toolkit.audio.album_resolver import normalize
+
+    return f"{normalize(artist)}|{normalize(title)}|{year}"

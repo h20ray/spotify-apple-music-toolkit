@@ -32,6 +32,7 @@ from toolkit.audio.album_resolver import (
     is_compilation_name,
     normalize,
     primary_artist,
+    cached_album,
     resolve_album,
     save_cache,
     strip_edition,
@@ -154,8 +155,12 @@ def plan_folder(
     on_row: Optional[Callable[[dict[str, Any], int, int], None]] = None,
     on_start: Optional[Callable[[dict[str, Any], int, int], None]] = None,
     only_suspicious: bool = False,
+    offline: bool = False,
 ) -> list[dict[str, Any]]:
     """Read tags of every file, look up the original album, return one report row per file.
+
+    With offline, only the local cache is used (no network at all); songs missing from it are reported as
+    NOT_FOUND with the note "not in cache (offline dry run)".
 
     With only_suspicious, files whose album neither looks like a compilation nor is shared by several artists are
     not looked up at all (marked OK), which skips most of the slow rate-limited requests.
@@ -185,10 +190,20 @@ def plan_folder(
             if on_row:
                 on_row(row, index, total)
             continue
-        if on_start:
-            on_start(entry, index, total)
-        if entry["title"] and entry["artist"]:
-            resolved = resolve_album(entry["artist"], entry["title"], str(entry["year"])[:4])
+        if offline:
+            found, resolved = cached_album(entry["artist"], entry["title"], str(entry["year"])[:4])
+            if not found:
+                row = decide(entry, None, shared)
+                row.update(note="not in cache (offline dry run)")
+                rows.append(row)
+                if on_row:
+                    on_row(row, index, total)
+                continue
+        else:
+            if on_start:
+                on_start(entry, index, total)
+            if entry["title"] and entry["artist"]:
+                resolved = resolve_album(entry["artist"], entry["title"], str(entry["year"])[:4])
         row = decide(entry, resolved, shared)
         rows.append(row)
         if on_row:
@@ -486,6 +501,11 @@ def run_cli(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("--folder", default=AUDIO_LIBRARY_DIR, help="folder to scan (subfolders included)")
     parser.add_argument("--full", action="store_true", help="look up every song, not only suspicious albums")
     parser.add_argument(
+        "--offline",
+        action="store_true",
+        help="dry run from the local cache only: no network, nothing is written except the report",
+    )
+    parser.add_argument(
         "--apply",
         nargs="?",
         const="all",
@@ -494,6 +514,9 @@ def run_cli(argv: Optional[list[str]] = None) -> int:
     )
     parser.add_argument("--restore", metavar="BACKUP_JSON", help="restore album/track tags from a backup and exit")
     args = parser.parse_args(argv)
+    if args.offline and args.apply:
+        print("--offline is a dry run and cannot be combined with --apply", flush=True)
+        return 2
 
     if args.restore:
         restored, count = restore_backup(args.restore)
@@ -527,7 +550,9 @@ def run_cli(argv: Optional[list[str]] = None) -> int:
 
     album_resolver.status_hook = lambda msg: print(f"    ({msg})", flush=True) if "rate limit" in msg else None
     try:
-        rows = plan_folder(args.folder, on_row=on_row, only_suspicious=not args.full)
+        rows = plan_folder(
+            args.folder, on_row=on_row, only_suspicious=not (args.full or args.offline), offline=args.offline
+        )
     finally:
         album_resolver.status_hook = None
     report = write_report(rows)
