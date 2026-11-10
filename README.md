@@ -78,6 +78,7 @@ python3 main.py
 5  Synced Lyrics Downloader
 6  Album Art Fixer
 7  Workspace status
+8  Album & Cover Fixer              (replace compilation albums with the original album + cover)
 
 0  Exit
 ```

@@ -8,6 +8,7 @@ from typing import Any, Optional
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
+from toolkit.audio.album_resolver import is_compilation_name
 from toolkit.audio.tagger.mood import calculate_mood
 from toolkit.core import (
     CACHE_DIR,
@@ -79,6 +80,7 @@ def select_best_original_track(items):
         album_name_lower = album_name.lower()
         is_compilation = (
             album_type == 'compilation'
+            or is_compilation_name(album_name, primary_artist)
             or any(k in album_name_lower for k in COMPILATION_KEYWORDS)
             or 'various' in primary_artist
         )
@@ -93,10 +95,15 @@ def select_best_original_track(items):
         else:
             others.append(track)
 
+    def earliest_plain_first(track):
+        album = track.get('album', {})
+        is_edition = any(k in album.get('name', '').lower() for k in ('deluxe', 'expanded', 'remaster', 'edition'))
+        return (is_edition, album.get('release_date') or '9999')
+
     if studio_albums:
-        return studio_albums[0]
+        return min(studio_albums, key=earliest_plain_first)
     elif singles:
-        return singles[0]
+        return min(singles, key=earliest_plain_first)
     elif others:
         return others[0]
     return items[0]
