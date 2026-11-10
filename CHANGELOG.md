@@ -8,8 +8,9 @@
   first and only changes files (album tag, year if empty, cover) after confirmation. Rows are CHANGE / REVIEW /
   NOT_FOUND / OK; only CHANGE is applied.
   Live progress (one line per song, ETA, rate-limit notices), results cached every 20 songs so a run can resume.
-- Genius API as the last-resort album source (iTunes, then MusicBrainz, then Genius) when `GENIUS_CLIENT_ID` and
-  `GENIUS_CLIENT_SECRET` are set in `.env`.
+- Genius API as the **last-resort** album source (only when iTunes and MusicBrainz fail or are unsure) when
+  `GENIUS_CLIENT_ID` and `GENIUS_CLIENT_SECRET` are set in `.env`; skipped otherwise. See
+  `docs/album_cover_fixer_guide.md`.
 - Track/disc numbers are taken from the original album (implausible iTunes numbers such as 138/163 are rejected).
 - Non-interactive CLI: `python -m toolkit.audio.album_fixer --folder DIR [--full] [--apply clean|all]`.
   Before writing, the current album/year/track tags are saved to `reports/album_fix_backup_<time>.json`;

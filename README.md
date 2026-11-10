@@ -4,6 +4,7 @@ CLI toolkit for local audio files and playlists:
 
 - Tag tracks (title, artist, album, genre, BPM, mood)
 - Embed high-res cover art
+- Replace compilation/playlist albums and covers with the original album (iTunes, then MusicBrainz, Genius only as a last resort)
 - Download synced `.lrc` lyrics
 - Build **Spotify** / **Apple Music** playlists from plain text lists
 
@@ -41,7 +42,7 @@ pip3 install -r requirements.txt
 |------|----------|
 | Spotify playlists / tagging | `SPOTIPY_CLIENT_ID`, `SPOTIPY_CLIENT_SECRET` |
 | Apple Music cloud playlists | `APPLE_MUSIC_USER_TOKEN` |
-| Album & Cover Fixer, Genius fallback (optional) | `GENIUS_CLIENT_ID`, `GENIUS_CLIENT_SECRET` |
+| Genius, last-resort album lookup in the Album & Cover Fixer (optional) | `GENIUS_CLIENT_ID`, `GENIUS_CLIENT_SECRET` |
 | Proxy (optional) | `HTTP_PROXY`, `HTTPS_PROXY` |
 
 Spotify keys: [Developer Dashboard](https://developer.spotify.com/dashboard) → create app → redirect `https://127.0.0.1:8888/callback`.
@@ -91,7 +92,7 @@ python3 main.py
 | `audio_library/` | Your tracks (and `.lrc` beside them) |
 | `playlist_sources/source_text_files/` | Input song lists |
 | `playlist_exports/` | Spotify / Apple Music / lyrics exports |
-| `reports/` | Run logs |
+| `reports/` | Run logs, album fix report and tag backups |
 | `toolkit/` | App code |
 
 ## Guides
@@ -99,6 +100,7 @@ python3 main.py
 More detail in [`docs/`](docs/):
 
 - [Audio tagger & album art](docs/audio_tagger_guide.md)
+- [Album & Cover Fixer](docs/album_cover_fixer_guide.md) (iTunes, then MusicBrainz, Genius only as a last resort)
 - [Lyrics](docs/lyrics_downloader_guide.md)
 - [Spotify playlists](docs/spotify_guide.md)
 - [Apple Music playlists](docs/apple_music_guide.md)
