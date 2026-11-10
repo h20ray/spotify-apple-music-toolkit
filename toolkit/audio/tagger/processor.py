@@ -14,6 +14,7 @@ from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn
 from rich.prompt import Prompt
 from rich.table import Table
 
+from toolkit.audio.album_resolver import is_compilation_name
 from toolkit.audio.metadata import read_all_existing_metadata
 from toolkit.audio.tagger.bpm import detect_physical_bpm
 from toolkit.audio.tagger.metadata_fetch import get_spotify_client, search_spotify_metadata
@@ -80,12 +81,17 @@ def _process_single_tagger_worker(fname, folder_path, mode, sp, thread_slot, pro
         if mode == "1":
             final_title = existing['title'] or sp_meta['title']
             final_artist = existing['artist'] or sp_meta['artist']
-            final_album = existing['album'] or sp_meta['album']
+            replace_album = bool(existing['album']) and is_compilation_name(
+                existing['album'], existing['artist'] or ""
+            )
+            final_album = sp_meta['album'] if replace_album else (existing['album'] or sp_meta['album'])
             final_genre = existing['genre'] or sp_meta['genre']
             final_year = existing['year'] or sp_meta['year']
             final_mood = sp_meta['mood']
-            write_cover = not existing['has_cover']
+            write_cover = replace_album or not existing['has_cover']
             action_desc = "Protected Existing Tags"
+            if replace_album:
+                action_desc += " (compilation album replaced)"
         else:
             final_title = sp_meta['title']
             final_artist = sp_meta['artist']

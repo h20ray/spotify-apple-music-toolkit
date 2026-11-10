@@ -11,6 +11,7 @@ from .metadata import (
 )
 from .tagger import process_audio_folder as tag_audio_folder
 from .artwork import process_album_art_fixer as fix_album_art
+from .album_fixer import main as run_album_fixer
 from .lyrics import sync_audio_library_lyrics, sync_playlist_text_lyrics
 
 __all__ = [
@@ -21,6 +22,7 @@ __all__ = [
     "read_local_audio_metadata",
     "tag_audio_folder",
     "fix_album_art",
+    "run_album_fixer",
     "sync_audio_library_lyrics",
     "sync_playlist_text_lyrics",
 ]
