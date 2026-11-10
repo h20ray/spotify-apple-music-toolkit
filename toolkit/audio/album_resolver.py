@@ -146,7 +146,7 @@ def valid_track_info(number: Any, total: Any, disc: Any = None, discs: Any = Non
     info = {"track": n, "track_total": t}
     try:
         d, ds = int(disc or 1), int(discs or 1)
-        if 1 <= d <= ds <= 10:
+        if 1 <= d <= ds <= 3:  # box sets list each album as "disc 3 of 6"; that is not the album's own disc
             info.update(disc=d, disc_total=ds)
     except (TypeError, ValueError):
         pass
@@ -169,7 +169,7 @@ def choose_itunes(results: list[dict[str, Any]], artist: str, title: str, year: 
     if not ranked:
         return None
     # equal score: prefer the plain album (fewest tracks, not a bundle) then the earliest release
-    ranked.sort(key=lambda r: (r[0], r[2].get("trackCount") or 9999, r[1]))
+    ranked.sort(key=lambda r: (r[0], r[2].get("trackCount") or 9999, r[2].get("discCount") or 1, r[1]))
     neg_score, date, item, why = ranked[0]
     art = (item.get("artworkUrl100") or "").replace("100x100bb", "1000x1000bb")
     track = _item_track(item)

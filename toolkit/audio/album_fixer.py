@@ -34,6 +34,7 @@ from toolkit.audio.album_resolver import (
     resolve_album,
     save_cache,
     strip_edition,
+    valid_track_info,
 )
 from toolkit.audio.artwork.embed import embed_artwork
 from toolkit.audio.artwork.sources import fetch_artwork_bytes
@@ -256,12 +257,8 @@ def write_album_tag(file_path: str, album: str, year: str = "", position: Option
 
 def apply_row(row: dict[str, Any]) -> dict[str, Any]:
     """Write the new album tag and cover for one report row."""
-    position = {
-        "track": row.get("track_no", 0),
-        "track_total": row.get("track_total", 0),
-        "disc": row.get("disc_no", 0),
-        "disc_total": row.get("disc_total", 0),
-    }
+    # re-validate: cached results may predate stricter rules (e.g. "disc 3 of 6" from box sets)
+    position = valid_track_info(row.get("track_no"), row.get("track_total"), row.get("disc_no"), row.get("disc_total"))
     ok = write_album_tag(row["file"], row["new_album"], str(row["year"]), position)
     cover = False
     if ok and row["art_url"]:

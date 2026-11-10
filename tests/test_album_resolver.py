@@ -341,3 +341,10 @@ def test_genius_year_fallbacks_and_musicbrainz_skips_compilation_named_albums():
         "release-group": {"id": "g", "primary-type": "Album", "secondary-types": []},
     }
     assert choose_musicbrainz([{"title": "Shower", "releases": [rel]}], "Shower") is None
+
+
+def test_valid_track_info_ignores_box_set_disc_numbers():
+    from toolkit.audio.album_resolver import valid_track_info
+
+    assert valid_track_info(3, 15, 3, 6) == {"track": 3, "track_total": 15}
+    assert valid_track_info(1, 12, 2, 2) == {"track": 1, "track_total": 12, "disc": 2, "disc_total": 2}
