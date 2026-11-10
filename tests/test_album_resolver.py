@@ -229,6 +229,7 @@ def test_resolve_album_prefers_musicbrainz_album_over_itunes_single(monkeypatch)
     monkeypatch.setattr(r, "_cache_loaded", True)
     single = {"source": "iTunes", "score": 95, "album": "Hollaback Girl - Single", "year": "2005", "why": ["single/EP"]}
     studio = {"source": "MusicBrainz", "score": None, "album": "Love. Angel. Music. Baby.", "year": "2004", "why": []}
+    monkeypatch.setattr(r, "search_genius", lambda *a: None)
     monkeypatch.setattr(r, "search_itunes", lambda *a: dict(single))
     monkeypatch.setattr(r, "search_musicbrainz", lambda *a: dict(studio))
     got = r.resolve_album("Gwen Stefani", "Hollaback Girl", "2005")
@@ -276,3 +277,67 @@ def test_is_clean_change():
     assert not is_clean_change({**base, "source": "MusicBrainz"})
     assert not is_clean_change({**base, "note": "kept the iTunes single/EP"})
     assert not is_clean_change({**base, "status": "REVIEW"})
+
+
+def test_search_genius_returns_album_and_skips_without_credentials(monkeypatch):
+    import toolkit.audio.album_resolver as r
+
+    monkeypatch.delenv("GENIUS_CLIENT_ID", raising=False)
+    monkeypatch.delenv("GENIUS_CLIENT_SECRET", raising=False)
+    monkeypatch.setattr(r, "_genius_token", [])
+    assert r.search_genius("Akon", "Beautiful") is None
+
+    class Resp:
+        status_code = 200
+
+        def __init__(self, payload):
+            self.payload = payload
+
+        def json(self):
+            return self.payload
+
+    song = {"id": 7, "title": "Beautiful", "primary_artist": {"name": "Akon"}}
+    detail = {"response": {"song": {"release_date": "2009-01-06", "album": {"name": "Freedom", "cover_art_url": "u"}}}}
+    monkeypatch.setattr(r, "_genius_token", ["tok"])
+    monkeypatch.setenv("GENIUS_CLIENT_ID", "id")
+    monkeypatch.setenv("GENIUS_CLIENT_SECRET", "secret")
+    monkeypatch.setattr(r, "_throttle", lambda *a: None)
+    monkeypatch.setattr(
+        r,
+        "http_get",
+        lambda url, **kw: Resp({"response": {"hits": [{"result": song}]}}) if url.endswith("/search") else Resp(detail),
+    )
+    got = r.search_genius("Akon", "Beautiful")
+    assert got["album"] == "Freedom" and got["year"] == "2009" and got["source"] == "Genius"
+
+
+def test_resolve_album_uses_genius_when_musicbrainz_finds_nothing(monkeypatch):
+    import toolkit.audio.album_resolver as r
+
+    monkeypatch.setattr(r, "_cache", {})
+    monkeypatch.setattr(r, "_cache_loaded", True)
+    monkeypatch.setattr(r, "search_itunes", lambda *a: None)
+    monkeypatch.setattr(r, "search_musicbrainz", lambda *a: None)
+    monkeypatch.setattr(
+        r,
+        "search_genius",
+        lambda *a: {"source": "Genius", "score": None, "album": "Freedom", "year": "2009", "why": []},
+    )
+    got = r.resolve_album("Akon", "Beautiful")
+    assert got["album"] == "Freedom" and "used Genius" in got["note"]
+
+
+def test_genius_year_fallbacks_and_musicbrainz_skips_compilation_named_albums():
+    import toolkit.audio.album_resolver as r
+
+    assert r._genius_year({"release_date": None, "release_date_for_display": "1993"}) == "1993"
+    assert r._genius_year({"release_date_for_display": "January 6, 2009"}) == "2009"
+    assert r._genius_year({"album": {"release_date_components": {"year": 1997}}}) == "1997"
+    assert r.is_compilation_name("Hitbreaker 2015 / 1")
+    rel = {
+        "title": "Hitbreaker 2015 / 1",
+        "status": "Official",
+        "date": "2015",
+        "release-group": {"id": "g", "primary-type": "Album", "secondary-types": []},
+    }
+    assert choose_musicbrainz([{"title": "Shower", "releases": [rel]}], "Shower") is None
