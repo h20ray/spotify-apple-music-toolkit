@@ -59,7 +59,6 @@ def parse_pls_file(file_path: str) -> list[str]:
     return [title for _, title in entries]
 
 
-
 def parse_m3u_file(file_path: str) -> list[str]:
     """Parse track titles from M3U / M3U8 #EXTINF tags or file lines."""
     if not os.path.exists(file_path):
@@ -86,7 +85,6 @@ def parse_m3u_file(file_path: str) -> list[str]:
                     if filename_no_ext:
                         songs.append(filename_no_ext)
     return songs
-
 
 
 def parse_songs(file_path: str) -> list[str]:
@@ -121,7 +119,6 @@ def convert_playlist_to_txt(file_path: str, output_path: str | None = None) -> s
             f.write(f"{song}\n")
 
     return output_path
-
 
 
 def clean_string(text):
@@ -409,4 +406,3 @@ def scan_playlist_files():
             'size': size_bytes
         })
     return file_info_list
-
