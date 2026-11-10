@@ -59,6 +59,10 @@ python -m toolkit.audio.album_fixer --restore reports\album_fix_backup_<time>.js
 
 `--apply clean` writes only the safest rows (plain iTunes matches); `--apply all` writes every CHANGE row.
 
+`--offline` is a dry run from the local cache only: no network, nothing written except the report, finishes in
+seconds. Songs that were never looked up show as `NOT_FOUND` with the note `not in cache (offline dry run)`.
+It cannot be combined with `--apply`.
+
 ---
 
 ## Report: `reports/album_fix_report.tsv`

@@ -415,6 +415,13 @@ def save_cache() -> None:
         logger.warning(f"Failed saving album resolver cache: {e}")
 
 
+def cached_album(artist: str, title: str, year: str = "") -> tuple[bool, Optional[dict[str, Any]]]:
+    """(found, result) from the local cache only; never touches the network."""
+    _load_cache()
+    key = f"{normalize(artist)}|{normalize(title)}|{year}"
+    return key in _cache, _cache.get(key)
+
+
 def resolve_album(artist: str, title: str, year: str = "") -> Optional[dict[str, Any]]:
     """Original-album lookup. iTunes when score >= SCORE_THRESHOLD, otherwise MusicBrainz."""
     _load_cache()
