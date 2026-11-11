@@ -132,6 +132,7 @@ def score_itunes_item(item: dict[str, Any], artist: str, title: str, year: str =
     return score, why
 
 
+ALT_STOREFRONTS = ("GB", "ID")  # tried in order when the US store has no good match
 MAX_ALBUM_TRACKS = 60
 
 
@@ -432,9 +433,11 @@ def resolve_album(artist: str, title: str, year: str = "") -> Optional[dict[str,
 
     _say("searching iTunes")
     itunes = search_itunes(artist, title, year)
-    if not itunes or itunes["score"] < SCORE_THRESHOLD:
-        _say("trying iTunes UK store")
-        alt = search_itunes(artist, title, year, country="GB")
+    for store in ALT_STOREFRONTS:
+        if itunes and itunes["score"] >= SCORE_THRESHOLD:
+            break
+        _say(f"trying iTunes {store} store")
+        alt = search_itunes(artist, title, year, country=store)
         if alt and (not itunes or alt["score"] > itunes["score"]):
             itunes = alt
     single_only = bool(itunes) and "single/EP" in itunes["why"]
