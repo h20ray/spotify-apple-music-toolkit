@@ -14,7 +14,6 @@ from toolkit.playlists.parser import (
 )
 
 
-
 def test_clean_string_strips_accents():
     assert clean_string("Beyoncé") == "beyonce"
 
@@ -113,4 +112,3 @@ def test_convert_playlist_to_txt(tmp_path):
     assert converted_path == str(output_txt)
     lines = output_txt.read_text(encoding="utf-8").splitlines()
     assert lines == ["Artist A - Song A", "Artist B - Song B"]
-

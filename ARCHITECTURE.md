@@ -18,6 +18,8 @@ main.py
 |---------|------|
 | `toolkit.core` | Paths, env, HTTP session/proxy, logging, shared constants |
 | `toolkit.audio` | Unified metadata reader; LRC lyrics |
+| `toolkit.audio.album_resolver` | Original-album lookup: iTunes, then MusicBrainz, then Genius (last resort); scoring and cache |
+| `toolkit.audio.album_fixer` | Album & Cover Fixer: plan, TSV report, tag backup/restore, apply, CLI |
 | `toolkit.audio.tagger` | Package: `metadata_fetch`, `bpm`, `mood`, `writer`, `processor` |
 | `toolkit.audio.artwork` | Package: `sources`, `embed`, `processor` |
 | `toolkit.playlists` | Spotify playlist creator; parse/sanitize; export TSV/M3U8/XML |
@@ -30,7 +32,8 @@ main.py
 2. **Network** — shared `requests.Session` + proxy/IPv4 fallback
 3. **Audio** — `metadata.read_audio_metadata` is single source; tagger/artwork/lyrics wrappers
 4. **Playlists** — `parser` cleans lines → provider search with scoring → optional cloud create → `exporter`
-5. **Cache** — `.cache/apple_music_search_cache.json`, `.cache/spotify_tag_cache.json`
+5. **Album fix** — `album_resolver` picks the original album (iTunes score >= 70, else MusicBrainz, else Genius) → `album_fixer` writes `reports/album_fix_report.tsv` → backs up tags → applies
+6. **Cache** — `.cache/apple_music_search_cache.json`, `.cache/spotify_tag_cache.json`, `.cache/album_resolver_cache.json`
 
 ## Threading
 

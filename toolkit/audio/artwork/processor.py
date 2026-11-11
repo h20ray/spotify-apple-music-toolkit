@@ -53,7 +53,7 @@ def _process_single_artwork_worker(
         )
 
     try:
-        art_url = get_high_res_artwork_itunes(query, info["album"])
+        art_url = get_high_res_artwork_itunes(query, info["album"], title=info["title"], artist=info["artist"])
         source_label = "iTunes API (1000x1000)"
 
         if not art_url:

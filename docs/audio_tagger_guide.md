@@ -50,3 +50,11 @@ python3 main.py
 
 - Select **Option 1: Complete Process Audio Library** to tag metadata, calculate BPM, embed cover art, AND download lyrics in 1 click!
 - Select **Option 4: Separate Utilities Menu** -> **Album Art Fixer** to only search and update album cover art.
+
+---
+
+## Wrong album or cover from a compilation?
+
+If tracks show a compilation or playlist as the album ("Millennium Pop Hits", "Summer Hits 2024"), use the
+[Album & Cover Fixer](album_cover_fixer_guide.md) (menu 8). It finds the original album via iTunes, then
+MusicBrainz, with Genius only as a last resort, and writes a report before changing any file.

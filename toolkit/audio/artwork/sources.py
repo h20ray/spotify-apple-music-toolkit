@@ -6,6 +6,7 @@ import random
 import re
 from typing import Optional
 
+from toolkit.audio.album_resolver import base_title, is_compilation_name, normalize, primary_artist
 from toolkit.core import http_get
 from toolkit.core.constants import (
     ITUNES_ARTWORK_FALLBACK_SIZES,
@@ -21,7 +22,7 @@ from toolkit.core.constants import (
     USER_AGENTS,
 )
 from toolkit.core.logging import get_logger
-from toolkit.playlists.parser import COMPILATION_KEYWORDS, pre_sanitize_song_line
+from toolkit.playlists.parser import pre_sanitize_song_line
 
 logger = get_logger(__name__)
 
@@ -55,19 +56,26 @@ def score_album_quality(album_name: str, artist_name: str = "") -> int:
     alb_lower = album_name.lower()
     art_lower = artist_name.lower()
 
-    if any(k in alb_lower for k in COMPILATION_KEYWORDS) or "various" in art_lower:
+    if is_compilation_name(album_name, artist_name) or "various" in art_lower:
         return QUALITY_SCORE_COMPILATION
     if "deluxe" in alb_lower or "remaster" in alb_lower or "expanded" in alb_lower:
         return QUALITY_SCORE_DELUXE_REMASTER
-    if "single" in alb_lower or "ep" in alb_lower:
+    if re.search(r"(single|ep)", alb_lower):
         return QUALITY_SCORE_SINGLE_EP
     return QUALITY_SCORE_STUDIO_ALBUM
 
 
-def get_high_res_artwork_itunes(query: str, target_album: Optional[str] = None) -> Optional[str]:
+def get_high_res_artwork_itunes(
+    query: str,
+    target_album: Optional[str] = None,
+    title: Optional[str] = None,
+    artist: Optional[str] = None,
+) -> Optional[str]:
     """
     Fetch high-res studio cover art URL via iTunes Search API with quality scoring.
     Upgrades low-res thumbnail URLs to uncompressed 1000x1000 image links.
+    When title is given, only results for that same song (and artist, if given) are considered.
+    A compilation target_album never earns a bonus.
     """
     url = "https://itunes.apple.com/search"
     params = {"term": query, "media": "music", "entity": "song", "limit": 15}
@@ -76,6 +84,14 @@ def get_high_res_artwork_itunes(query: str, target_album: Optional[str] = None) 
         res = http_get(url, params=params, headers=get_random_agent_headers(), timeout=TIMEOUT_API_SHORT)
         if res.status_code == 200:
             results = res.json().get("results", [])
+            if title:
+                wanted = base_title(title)
+                artist_key = normalize(primary_artist(artist)) if artist else ""
+                results = [
+                    r for r in results
+                    if base_title(r.get("trackName", "")) == wanted
+                    and artist_key in normalize(r.get("artistName", ""))
+                ]
             if not results:
                 return None
 
@@ -87,7 +103,12 @@ def get_high_res_artwork_itunes(query: str, target_album: Optional[str] = None) 
                 art_name = item.get("artistName", "")
                 score = score_album_quality(alb_name, art_name)
 
-                if target_album and alb_name and target_album.lower() in alb_name.lower():
+                if (
+                    target_album
+                    and alb_name
+                    and not is_compilation_name(target_album, art_name)
+                    and target_album.lower() in alb_name.lower()
+                ):
                     score += 50
 
                 if score > best_score:
