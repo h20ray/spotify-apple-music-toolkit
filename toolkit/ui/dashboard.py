@@ -189,10 +189,15 @@ def main() -> None:
             " [bold bright_white]7[/bold bright_white] "
             "[bold yellow]View Workspace Files & Status[/bold yellow]"
         )
+        console.print(
+            " [bold bright_white]8[/bold bright_white] "
+            "[bold bright_green]Album & Cover Fixer[/bold bright_green] "
+            "[dim](Replace compilation albums with the original album via iTunes + MusicBrainz)[/dim]"
+        )
         console.print()
         console.print(" [bold bright_white]0[/bold bright_white] [dim white]Exit[/dim white]")
 
-        choice = Prompt.ask("\nSelect option", choices=["1", "2", "3", "4", "5", "6", "7", "0"], default="1")
+        choice = Prompt.ask("\nSelect option", choices=["1", "2", "3", "4", "5", "6", "7", "8", "0"], default="1")
 
         if choice == "1":
             run_one_click_complete_process()
@@ -223,6 +228,11 @@ def main() -> None:
 
         elif choice == "7":
             scan_workspace_overview()
+            Prompt.ask("\nPress Enter to return")
+
+        elif choice == "8":
+            import toolkit.audio.album_fixer as album_fixer
+            album_fixer.main()
             Prompt.ask("\nPress Enter to return")
 
         elif choice == "0":
