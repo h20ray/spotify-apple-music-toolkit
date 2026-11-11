@@ -318,7 +318,7 @@ def test_resolve_album_uses_genius_when_musicbrainz_finds_nothing(monkeypatch):
 
     monkeypatch.setattr(r, "_cache", {})
     monkeypatch.setattr(r, "_cache_loaded", True)
-    monkeypatch.setattr(r, "search_itunes", lambda *a: None)
+    monkeypatch.setattr(r, "search_itunes", lambda *a, **k: None)
     monkeypatch.setattr(r, "search_musicbrainz", lambda *a: None)
     monkeypatch.setattr(
         r,
@@ -408,3 +408,20 @@ def r_key(artist, title, year):
     from toolkit.audio.album_resolver import normalize
 
     return f"{normalize(artist)}|{normalize(title)}|{year}"
+
+
+def test_resolve_album_uses_uk_store_when_us_only_has_compilations(monkeypatch):
+    import toolkit.audio.album_resolver as r
+
+    monkeypatch.setattr(r, "_cache", {})
+    monkeypatch.setattr(r, "_cache_loaded", True)
+    calls = []
+
+    def fake_itunes(artist, title, year="", country="US"):
+        calls.append(country)
+        album, score = ("90's RnB", 60) if country == "US" else ("All Saints", 100)
+        return {"source": "iTunes", "score": score, "album": album, "year": "1997", "why": []}
+
+    monkeypatch.setattr(r, "search_itunes", fake_itunes)
+    got = r.resolve_album("All Saints", "Never Ever (Radio Edit)", "2006")
+    assert got["album"] == "All Saints" and calls == ["US", "GB"]
