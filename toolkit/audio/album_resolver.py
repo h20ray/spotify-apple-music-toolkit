@@ -248,10 +248,10 @@ def _throttle(key: str, interval: float) -> None:
         _last_call[key] = time.monotonic()
 
 
-def search_itunes(artist: str, title: str, year: str = "") -> Optional[dict[str, Any]]:
+def search_itunes(artist: str, title: str, year: str = "", country: str = "US") -> Optional[dict[str, Any]]:
     clean_title = re.sub(r"\s*[\(\[].*?[\)\]]", "", title).strip()
     term = f"{primary_artist(artist)} {clean_title}"
-    params = {"term": term, "entity": "song", "limit": 50, "country": "US"}
+    params = {"term": term, "entity": "song", "limit": 50, "country": country}
     for attempt in range(3):
         _throttle("itunes", ITUNES_MIN_INTERVAL)
         try:
@@ -432,6 +432,11 @@ def resolve_album(artist: str, title: str, year: str = "") -> Optional[dict[str,
 
     _say("searching iTunes")
     itunes = search_itunes(artist, title, year)
+    if not itunes or itunes["score"] < SCORE_THRESHOLD:
+        _say("trying iTunes UK store")
+        alt = search_itunes(artist, title, year, country="GB")
+        if alt and (not itunes or alt["score"] > itunes["score"]):
+            itunes = alt
     single_only = bool(itunes) and "single/EP" in itunes["why"]
     if itunes and itunes["score"] >= SCORE_THRESHOLD and not single_only:
         result: Optional[dict[str, Any]] = itunes
