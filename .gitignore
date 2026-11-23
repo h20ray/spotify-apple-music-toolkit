@@ -13,6 +13,13 @@ scratch/
 playlist_exports/**/search_cache.json
 playlist_exports/**/apple_music_search_cache.json
 
+# Local run logs and copyrighted audio anywhere in the tree
+*.log
+*.m4a
+*.mp3
+*.flac
+*.wav
+
 # Exclude all copyrighted audio files and lyrics in audio_library to comply with DMCA
 audio_library/*
 !audio_library/.gitkeep

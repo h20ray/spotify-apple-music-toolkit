@@ -107,4 +107,4 @@ More detail in [`docs/`](docs/):
 
 ## License
 
-Open source — free to use.
+This project is licensed under the [MIT License](LICENSE).

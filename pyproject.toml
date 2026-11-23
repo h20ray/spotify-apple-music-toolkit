@@ -7,6 +7,7 @@ name = "spotify-audio-toolkit"
 version = "1.0.0"
 description = "Spotify and Apple Music audio tagging, lyrics, and playlist toolkit"
 requires-python = ">=3.10"
+license = "MIT"
 dependencies = [
   "spotipy~=2.23.0",
   "mutagen~=1.47.0",
